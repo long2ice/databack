@@ -1,2 +1,3 @@
 # databack
-Backup you data from MySQL/PostgreSQL etc to any other storages
+
+Backup you data from MySQL/PostgreSQL etc. to any other storages.
