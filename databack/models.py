@@ -1,6 +1,6 @@
 from tortoise import Model, fields
 
-from databack.enums import DataSourceType, StorgeType, TaskStatus
+from databack.enums import DataSourceType, StorageType, TaskStatus
 
 
 class BaseModel(Model):
@@ -12,19 +12,19 @@ class BaseModel(Model):
 
 
 class Storage(BaseModel):
-    type = fields.CharEnumField(StorgeType)
-    name = fields.CharField(max_length=255)
-    connection = fields.JSONField()
+    type = fields.CharEnumField(StorageType)
+    name = fields.CharField(max_length=255, unique=True)
+    options = fields.JSONField()
 
 
 class DataSource(BaseModel):
     type = fields.CharEnumField(DataSourceType)
-    name = fields.CharField(max_length=255)
-    connection = fields.JSONField()
+    name = fields.CharField(max_length=255, unique=True)
+    options = fields.JSONField()
 
 
 class Task(BaseModel):
-    name = fields.CharField(max_length=255)
+    name = fields.CharField(max_length=255, unique=True)
     storage: fields.ForeignKeyRelation[Storage] = fields.ForeignKeyField("models.Storage")
     data_source: fields.ForeignKeyRelation[DataSource] = fields.ForeignKeyField("models.DataSource")
     compress = fields.BooleanField(default=True)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from tortoise.contrib.pydantic import pydantic_queryset_creator
 
@@ -21,9 +21,9 @@ async def get_storage(limit: int = 10, offset: int = 0):
 
 
 class CreateStorageRequest(BaseModel):
-    type: str
-    name: str
-    connection: dict
+    type: str = Field(..., example="local")
+    name: str = Field(..., example="local")
+    options: dict = Field(..., example={"path": "/tmp"})
 
 
 @router.post("", status_code=HTTP_201_CREATED)
@@ -34,11 +34,14 @@ async def create_storage(body: CreateStorageRequest):
 class UpdateStorageRequest(BaseModel):
     type: str | None
     name: str | None
-    connection: dict | None
+    options: dict | None
 
 
 @router.patch("/{pk}", status_code=HTTP_204_NO_CONTENT)
 async def update_storage(pk: int, body: UpdateStorageRequest):
+    storage = await Storage.get(id=pk)
+    if body.options:
+        body.options = {**storage.options, **body.options}  # type: ignore
     await Storage.filter(id=pk).update(**body.dict(exclude_none=True))
 
 

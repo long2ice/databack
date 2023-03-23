@@ -14,9 +14,9 @@ loguru = "*"
 aerich = "*"
 asyncmy = "*"
 asyncpg = "*"
-s3fs="*"
-sshfs = "*"
 rearq = { git = "https://github.com/long2ice/rearq.git", branch = "dev" }
+aioshutil = "*"
+aioboto3 = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
@@ -26,6 +26,7 @@ pytest = "*"
 pytest-asyncio = "*"
 pytest-custom-exit-code = "*"
 ruff = "*"
+types-aiofiles = "*"
 
 
 [tool.aerich]

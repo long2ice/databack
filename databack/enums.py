@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class StorgeType(str, Enum):
+class StorageType(str, Enum):
     local = "local"
     ssh = "ssh"
     s3 = "s3"

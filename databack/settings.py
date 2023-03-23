@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: str | None = None
     ENV = "production"
     DB_URL: str
+    REDIS_URL: str
 
     class Config:
         env_file = ".env"
