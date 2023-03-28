@@ -1,3 +1,4 @@
+import aiofiles.ospath
 import aioshutil
 
 from databack.datasource import Base
@@ -12,7 +13,7 @@ class Local(Base):
         self.path = self.kwargs.get("path")
 
     async def check(self):
-        pass
+        return await aiofiles.ospath.exists(self.path)
 
     async def backup(self):
         return self.path

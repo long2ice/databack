@@ -1,5 +1,7 @@
 import abc
+import os.path
 import tempfile
+from datetime import datetime
 
 import aioshutil
 
@@ -12,6 +14,10 @@ class Base:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.compress = self.kwargs.pop("compress", True)
+
+    @property
+    def filename(self):
+        return f'{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
 
     @abc.abstractmethod
     async def check(self):
@@ -28,14 +34,12 @@ class Base:
         if self.compress:
             temp_dir = tempfile.mkdtemp()
             await aioshutil.unpack_archive(file, temp_dir)
-            return temp_dir
+            return os.path.join(temp_dir, os.path.basename(file).replace(".tar.gz", ""))
         return file
 
-    async def get_backup(
-        self,
-    ):
+    async def get_backup(self):
         backup = await self.backup()
         if self.compress:
-            temp_dir = tempfile.mkdtemp()
-            return await aioshutil.make_archive(temp_dir, "gztar", backup)
+            name = os.path.basename(backup)
+            return await aioshutil.make_archive(name, "gztar", root_dir=os.path.dirname(backup))
         return backup

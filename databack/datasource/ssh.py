@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import asyncssh
@@ -20,7 +21,8 @@ class SSH(Base):
         self.private_key_pass = self.kwargs.get("private_key_pass")
 
     async def check(self):
-        pass
+        async with self._get_connection() as conn:
+            return await conn.run("ls", self.path, check=True)
 
     def _get_connection(self):
         return asyncssh.connect(
@@ -37,7 +39,7 @@ class SSH(Base):
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
                 await sftp.get(self.path, temp_dir)
-        return temp_dir
+        return os.path.join(temp_dir, os.path.basename(self.path))
 
     async def restore(self, file: str):
         async with self._get_connection() as conn:

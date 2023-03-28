@@ -1,11 +1,13 @@
+import os
+
 import asyncssh
+from pydantic import BaseModel
 
 from databack.enums import StorageType
 from databack.storages import Base
 
 
-class SSH(Base):
-    type = StorageType.ssh
+class SSHOptions(BaseModel):
     path: str
     host: str
     port: int
@@ -14,25 +16,29 @@ class SSH(Base):
     private_key: str
     private_key_pass: str
 
+
+class SSH(Base):
+    type = StorageType.ssh
+    options: SSHOptions
+
     def __init__(
         self,
-        path: str,
-        host: str,
-        port: int,
-        username: str,
-        password: str,
-        private_key: str,
-        private_key_pass: str,
+        options: SSHOptions,
     ):
         super().__init__(
-            path=path,
-            host=host,
-            port=port,
-            username=username,
-            password=password,
-            private_key=private_key,
-            private_key_pass=private_key_pass,
+            options=options,
         )
+        self.path = options.path
+        self.host = options.host
+        self.port = options.port
+        self.username = options.username
+        self.password = options.password
+        self.private_key = options.private_key
+        self.private_key_pass = options.private_key_pass
+
+    async def check(self):
+        async with self._get_connection() as conn:
+            return await conn.run("ls", self.path, check=True)
 
     def _get_connection(self):
         return asyncssh.connect(
@@ -48,8 +54,13 @@ class SSH(Base):
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
                 await sftp.put(file, self.path)
+                return os.path.join(self.path, os.path.basename(file))
 
     async def download(self, file: str):
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
                 await sftp.get(self.path, file)
+
+    async def delete(self, file: str):
+        async with self._get_connection() as conn:
+            await conn.run("rm", os.path.join(self.path, file))

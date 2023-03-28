@@ -17,6 +17,7 @@ asyncpg = "*"
 rearq = { git = "https://github.com/long2ice/rearq.git", branch = "dev" }
 aioshutil = "*"
 aioboto3 = "*"
+asyncssh = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"

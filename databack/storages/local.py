@@ -1,20 +1,31 @@
 import os
 
+import aiofiles.os
+import aiofiles.ospath
 import aioshutil
+from pydantic import BaseModel
 
 from databack.enums import StorageType
 from databack.storages import Base
 
 
-class Local(Base):
-    type = StorageType.local
+class LocalOptions(BaseModel):
     path: str
 
-    def __init__(self, path: str):
-        super().__init__(path=path)
+
+class Local(Base):
+    type = StorageType.local
+    options: LocalOptions
+
+    async def check(self):
+        return await aiofiles.ospath.exists(self.options.path)
 
     async def upload(self, file: str):
-        await aioshutil.move(file, self.path)
+        await aioshutil.move(file, self.options.path)
+        return os.path.join(self.options.path, os.path.basename(file))
 
     async def download(self, file: str):
-        return os.path.join(self.path, file)
+        return os.path.join(self.options.path, file)
+
+    async def delete(self, file: str):
+        await aiofiles.os.remove(os.path.join(self.options.path, file))
