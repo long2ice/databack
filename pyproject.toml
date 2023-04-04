@@ -18,6 +18,7 @@ rearq = { git = "https://github.com/long2ice/rearq.git", branch = "dev" }
 aioshutil = "*"
 aioboto3 = "*"
 asyncssh = "*"
+python-i18n = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"

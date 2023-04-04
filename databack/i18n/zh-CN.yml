@@ -1,0 +1,1 @@
+data_source_exists: "数据源 '%{name}' 已经存在！"

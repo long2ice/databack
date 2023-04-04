@@ -22,11 +22,14 @@ class Scheduler:
                     cron = CronTab(task.cron)
                     next_time = cron.next(default_utc=False)
                     if next_time <= 0:
+                        logger.info(f"Run task {task.name} now")
                         await run_task.delay(task.pk)
                         wait_seconds.append(next_time)
             except Exception as e:
                 logger.error(f"Scheduler error: {e}")
-            min_wait_seconds = min(wait_seconds) if wait_seconds else SCHEDULER_SLEEP_SECONDS
+            min_wait_seconds = (
+                min(wait_seconds) if wait_seconds else SCHEDULER_SLEEP_SECONDS
+            )
             cls._wait_task = asyncio.create_task(asyncio.sleep(min_wait_seconds))
             try:
                 await cls._wait_task

@@ -1646,6 +1646,21 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "python-i18n"
+version = "0.3.9"
+description = "Translation library for Python"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-i18n-0.3.9.tar.gz", hash = "sha256:df97f3d2364bf3a7ebfbd6cbefe8e45483468e52a9e30b909c6078f5f471e4e8"},
+    {file = "python_i18n-0.3.9-py3-none-any.whl", hash = "sha256:bda5b8d889ebd51973e22e53746417bd32783c9bd6780fd27cadbb733915651d"},
+]
+
+[package.extras]
+yaml = ["pyyaml (>=3.10)"]
+
+[[package]]
 name = "python-multipart"
 version = "0.0.6"
 description = "A streaming multipart parser for Python"
@@ -2440,4 +2455,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "7622c0aa6b27d0dcc0d6cdcf6e4e8ac1ffaf9c104b9843cb8a208f239e16cd5e"
+content-hash = "825bb0dd32dab3bf0a5d57ba7015df086d16f8feca14eab5e12bb21a6975fe6f"

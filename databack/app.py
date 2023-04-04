@@ -7,6 +7,7 @@ from rearq.server.app import app as rearq_server
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
+from databack import i18n
 from databack.exceptions import (
     custom_http_exception_handler,
     exception_handler,
@@ -46,6 +47,7 @@ app.add_exception_handler(Exception, exception_handler)
 async def startup():
     await rearq.init()
     init_logging()
+    i18n.init()
     aerich = Command(TORTOISE_ORM)
     await aerich.init()
     await aerich.upgrade()

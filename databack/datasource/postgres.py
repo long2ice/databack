@@ -12,14 +12,15 @@ from databack.enums import DataSourceType
 class Postgres(Base):
     type = DataSourceType.postgres
 
-    def __init__(self, password: str, **kwargs):
+    def __init__(self, password: str, backup_program: str, **kwargs):
         super().__init__(**kwargs)
         self.options = self.kwargs
         self.password = password
+        self.backup_program = backup_program
 
     async def check(self):
-        if not await aioshutil.which("pg_dump"):
-            raise ValueError("pg_dump not found in PATH")
+        if not await aioshutil.which(self.backup_program):
+            raise ValueError(f"{self.backup_program} not found in PATH")
         return True
 
     async def backup(self):
@@ -28,7 +29,7 @@ class Postgres(Base):
         file = f"{temp_dir}/{self.filename}.sql"
         options.append(f"-f {file}")
         proc = await asyncio.create_subprocess_exec(
-            "pg_dump",
+            self.backup_program,
             *options,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -36,7 +37,9 @@ class Postgres(Base):
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode != 0:
-            raise RuntimeError(f"pg_dump failed with {proc.returncode}: {stderr.decode()}")
+            raise RuntimeError(
+                f"pg_dump failed with {proc.returncode}: {stderr.decode()}"
+            )
         return file
 
     async def restore(self, file: str):
@@ -55,7 +58,9 @@ class Postgres(Base):
             content = await f.read()
         stdout, stderr = await proc.communicate(content.encode())
         if proc.returncode != 0:
-            raise RuntimeError(f"pg_restore failed with {proc.returncode}: {stderr.decode()}")
+            raise RuntimeError(
+                f"pg_restore failed with {proc.returncode}: {stderr.decode()}"
+            )
         if stdout:
             logger.info(stdout.decode())
         if stderr:
