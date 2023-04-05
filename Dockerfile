@@ -8,10 +8,16 @@ RUN pip3 install poetry && poetry install --no-root
 COPY . /databack
 RUN poetry install
 
+FROM node as frontend-builder
+RUN git clone https://github.com/long2ice/databack-web.git /databack-web
+WORKDIR /databack-web
+RUN npm install && npm run build
+
 FROM python:3.11-slim
 WORKDIR /databack
-COPY --from=builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY --from=builder /databack /databack
+COPY --from=frontend-builder /databack-web/dist /databack/databack_web/static
 ENTRYPOINT ["uvicorn", "databack.app:app", "--host", "0.0.0.0"]
 CMD ["--port", "8000"]

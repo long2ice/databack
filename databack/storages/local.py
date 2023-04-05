@@ -28,4 +28,7 @@ class Local(Base):
         return os.path.join(self.options.path, file)
 
     async def delete(self, file: str):
-        await aiofiles.os.remove(os.path.join(self.options.path, file))
+        try:
+            await aiofiles.os.remove(os.path.join(self.options.path, file))
+        except FileNotFoundError:
+            pass

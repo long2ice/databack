@@ -2,7 +2,7 @@ import i18n
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
-from tortoise.contrib.pydantic import pydantic_queryset_creator, pydantic_model_creator
+from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 from tortoise.exceptions import IntegrityError
 
 from databack.discover import get_data_source
@@ -19,7 +19,7 @@ class GetDataSourceResponse(BaseModel):
 
 @router.get("", response_model=GetDataSourceResponse)
 async def get_datasource(
-    limit: int = 10, offset: int = 0, name: str = "", type: DataSourceType = None
+    limit: int = 10, offset: int = 0, name: str = "", type: DataSourceType | None = None
 ):
     qs = DataSource.all()
     if name:
@@ -36,8 +36,14 @@ async def get_datasource(
     return {"total": total, "data": data}
 
 
+@router.get("/basic")
+async def get_datasource_basic():
+    data = await DataSource.all().values("id", "name")
+    return data
+
+
 @router.get("/{pk}", response_model=pydantic_model_creator(DataSource))  # type: ignore
-async def get_datasource(pk: int):
+async def get_datasource_(pk: int):
     return await DataSource.get(id=pk)
 
 
@@ -63,9 +69,7 @@ async def create_datasource(body: CreateDataSourceRequest):
     data_source_cls = get_data_source(body.type)
     data_source_obj = data_source_cls(**body.options)
     if not await data_source_obj.check():
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST, detail="Data source check failed"
-        )
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Data source check failed")
     try:
         await DataSource.create(**body.dict())
     except IntegrityError:
@@ -84,14 +88,10 @@ class UpdateDataSourceRequest(BaseModel):
 @router.patch("/{pk}", status_code=HTTP_204_NO_CONTENT)
 async def update_datasource(pk: int, body: UpdateDataSourceRequest):
     data_source = await DataSource.get(id=pk)
-    if body.options:
-        body.options = {**data_source.options, **body.options}  # type: ignore
     data_source_cls = get_data_source(data_source.type)
     data_source_obj = data_source_cls(**data_source.options)  # type: ignore
     if not await data_source_obj.check():
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST, detail="Data source check failed"
-        )
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Data source check failed")
     try:
         await DataSource.filter(id=pk).update(**body.dict(exclude_none=True))
     except IntegrityError:

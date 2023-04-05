@@ -4,6 +4,7 @@ from databack.enums import DataSourceType, StorageType, TaskStatus
 from databack.storages.local import LocalOptions
 from databack.storages.s3 import S3Options
 from databack.storages.ssh import SSHOptions
+from databack.validators import CronValidator
 
 
 class BaseModel(Model):
@@ -43,22 +44,18 @@ class Task(BaseModel):
     storage: fields.ForeignKeyRelation[Storage] = fields.ForeignKeyField("models.Storage")
     data_source: fields.ForeignKeyRelation[DataSource] = fields.ForeignKeyField("models.DataSource")
     compress = fields.BooleanField(default=True)
-    keep_num = fields.IntField(default=3)
+    keep_num = fields.IntField(default=0)
+    keep_days = fields.IntField(default=0)
     enabled = fields.BooleanField(default=True)
-    cron = fields.CharField(max_length=255)
+    cron = fields.CharField(max_length=255, validators=[CronValidator()])
 
 
 class TaskLog(BaseModel):
     task: fields.ForeignKeyRelation[Task] = fields.ForeignKeyField("models.Task")
     status = fields.CharEnumField(TaskStatus)
     path = fields.CharField(max_length=255, null=True)
+    size = fields.IntField(null=True)
     message = fields.TextField(null=True)
     is_deleted = fields.BooleanField(default=False)
     start_at = fields.DatetimeField()
     end_at = fields.DatetimeField(null=True)
-
-
-class Backup(BaseModel):
-    task: fields.ForeignKeyRelation[Task] = fields.ForeignKeyField("models.Task")
-    path = fields.CharField(max_length=255)
-    size = fields.IntField()

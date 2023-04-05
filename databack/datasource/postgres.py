@@ -37,9 +37,7 @@ class Postgres(Base):
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode != 0:
-            raise RuntimeError(
-                f"pg_dump failed with {proc.returncode}: {stderr.decode()}"
-            )
+            raise RuntimeError(f"pg_dump failed with {proc.returncode}: {stderr.decode()}")
         return file
 
     async def restore(self, file: str):
@@ -58,9 +56,7 @@ class Postgres(Base):
             content = await f.read()
         stdout, stderr = await proc.communicate(content.encode())
         if proc.returncode != 0:
-            raise RuntimeError(
-                f"pg_restore failed with {proc.returncode}: {stderr.decode()}"
-            )
+            raise RuntimeError(f"pg_restore failed with {proc.returncode}: {stderr.decode()}")
         if stdout:
             logger.info(stdout.decode())
         if stderr:

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
-from tortoise.contrib.pydantic import pydantic_queryset_creator, pydantic_model_creator
+from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from databack import discover
 from databack.enums import StorageType
@@ -18,7 +18,7 @@ class GetStorageResponse(BaseModel):
 
 @router.get("", response_model=GetStorageResponse)
 async def get_storages(
-    limit: int = 10, offset: int = 0, name: str = "", type: StorageType = None
+    limit: int = 10, offset: int = 0, name: str = "", type: StorageType | None = None
 ):
     qs = Storage.all()
     if name:
@@ -33,6 +33,12 @@ async def get_storages(
         .offset(offset)
     )
     return {"total": total, "data": storages}
+
+
+@router.get("/basic")
+async def get_storage_basic():
+    data = await Storage.all().values("id", "name")
+    return data
 
 
 @router.get("/{pk}", response_model=pydantic_model_creator(Storage))  # type: ignore
@@ -53,9 +59,7 @@ async def create_storage(body: CreateStorageRequest):
     storage_cls = discover.get_storage(body.type)
     storage_obj = storage_cls(body.options)
     if not await storage_obj.check():
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST, detail="Storage check failed"
-        )
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Storage check failed")
     await Storage.create(**body.dict())
 
 
@@ -68,14 +72,10 @@ class UpdateStorageRequest(BaseModel):
 @router.patch("/{pk}", status_code=HTTP_204_NO_CONTENT)
 async def update_storage(pk: int, body: UpdateStorageRequest):
     storage = await Storage.get(id=pk)
-    if body.options:
-        body.options = {**storage.options, **body.options.dict()}  # type: ignore
     storage_cls = discover.get_storage(storage.type)
     storage_obj = storage_cls(storage.options_parsed)
     if not await storage_obj.check():
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST, detail="Storage check failed"
-        )
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Storage check failed")
     await Storage.filter(id=pk).update(**body.dict(exclude_none=True))
 
 

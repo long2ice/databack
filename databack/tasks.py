@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from loguru import logger
 from rearq import ReArq
 from tortoise import Tortoise, timezone
@@ -6,6 +8,7 @@ from databack.discover import get_data_source, get_storage
 from databack.enums import TaskStatus
 from databack.models import Task, TaskLog
 from databack.settings import settings
+from databack.utils import get_file_size
 
 rearq = ReArq(
     db_url=settings.DB_URL,
@@ -51,16 +54,19 @@ async def run_task(pk: int):
         path = await storage_obj.upload(backup)
         task_log.status = TaskStatus.success
         task_log.path = path
+        task_log.size = await get_file_size(path)
         task_log.end_at = timezone.now()
     except Exception as e:
-        logger.error(f"Task {pk} error: {e}")
+        logger.error(f"Task {task.name} error: {e}")
         task_log.status = TaskStatus.failed
         task_log.message = str(e)
     await task_log.save()
     if task_log.status == TaskStatus.success:
         qs = TaskLog.filter(task=task, status=TaskStatus.success, is_deleted=False)
         total_success = await qs.count()
-        if total_success > task.keep_num:
+        if 0 < task.keep_num < total_success:
+            if task.keep_days > 0:
+                qs = qs.filter(end_at__lte=timezone.now() - timedelta(days=task.keep_days))
             task_logs_to_be_deleted = await qs.order_by("id").limit(total_success - task.keep_num)
             for task_log_to_be_deleted in task_logs_to_be_deleted:
                 await storage_obj.delete(task_log_to_be_deleted.path)

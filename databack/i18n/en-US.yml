@@ -1,1 +1,3 @@
 data_source_exists: "Data source '%{name}' already exists!"
+cron_invalid: "Invalid cron expression '%{cron}'"
+task_disabled: "Task '%{name}' is disabled"
