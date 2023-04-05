@@ -16,7 +16,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           image-name: databack
-          custom-args: --cache-from=ghcr.io/long2ice/databack/databack
   deploy:
     runs-on: ubuntu-latest
     needs:
@@ -31,5 +30,4 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd /root/docker/databack/
-            docker compose pull
-            docker compose up -d
+            docker compose pull --pull always

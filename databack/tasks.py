@@ -52,6 +52,7 @@ async def run_task(pk: int):
     try:
         backup = await data_source_obj.get_backup()
         path = await storage_obj.upload(backup)
+        await storage_obj.delete(backup)
         task_log.status = TaskStatus.success
         task_log.path = path
         task_log.size = await get_file_size(path)
@@ -66,8 +67,12 @@ async def run_task(pk: int):
         total_success = await qs.count()
         if 0 < task.keep_num < total_success:
             if task.keep_days > 0:
-                qs = qs.filter(end_at__lte=timezone.now() - timedelta(days=task.keep_days))
-            task_logs_to_be_deleted = await qs.order_by("id").limit(total_success - task.keep_num)
+                qs = qs.filter(
+                    end_at__lte=timezone.now() - timedelta(days=task.keep_days)
+                )
+            task_logs_to_be_deleted = await qs.order_by("id").limit(
+                total_success - task.keep_num
+            )
             for task_log_to_be_deleted in task_logs_to_be_deleted:
                 await storage_obj.delete(task_log_to_be_deleted.path)
                 task_log_to_be_deleted.is_deleted = True

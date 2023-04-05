@@ -4,7 +4,6 @@ from aerich import Command
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from rearq.server.app import app as rearq_server
-from starlette.staticfiles import StaticFiles
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
@@ -19,6 +18,7 @@ from databack.log import init_logging
 from databack.routes import router
 from databack.scheduler import Scheduler
 from databack.settings import TORTOISE_ORM, settings
+from databack.static import SPAStaticFiles
 from databack.tasks import rearq
 
 if settings.DEBUG:
@@ -33,7 +33,7 @@ else:
     )
 app.include_router(router, prefix="/api")
 app.mount("/rearq", rearq_server)
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
+app.mount("/", SPAStaticFiles(directory="static", html=True), name="static")
 
 rearq_server.set_rearq(rearq)
 register_tortoise(

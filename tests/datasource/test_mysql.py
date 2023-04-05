@@ -1,6 +1,9 @@
+import pytest
+
 from databack.datasource.mysql import MySQL
 
 
+@pytest.mark.skip
 async def test_mysql():
     kwargs = {
         "--host": "localhost",

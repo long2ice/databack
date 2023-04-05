@@ -1,0 +1,14 @@
+version: "3"
+services:
+  databack:
+    image: databack
+    build: .
+    restart: always
+    env_file: .env
+    network_mode: host
+  worker:
+    image: databack
+    restart: always
+    env_file: .env
+    network_mode: host
+    entrypoint: rearq databack.tasks:rearq worker -t

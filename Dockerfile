@@ -15,9 +15,10 @@ RUN npm install && npm run build
 
 FROM python:3.11-slim
 WORKDIR /databack
+RUN apt update -y && apt install -y default-mysql-client postgresql-client
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY --from=builder /databack /databack
-COPY --from=frontend-builder /databack-web/dist /databack/databack_web/static
+COPY --from=frontend-builder /databack-web/dist /databack/static
 ENTRYPOINT ["uvicorn", "databack.app:app", "--host", "0.0.0.0"]
 CMD ["--port", "8000"]
