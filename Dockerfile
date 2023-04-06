@@ -17,6 +17,7 @@ FROM snakepacker/python:3.11
 WORKDIR /databack
 RUN apt update -y && apt install -y mysql-client postgresql-client
 COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/lib /usr/lib
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /databack /databack
 COPY --from=frontend-builder /databack-web/dist /databack/static
