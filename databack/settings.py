@@ -1,5 +1,6 @@
 import sentry_sdk
 from pydantic import BaseSettings
+from sentry_sdk.integrations.redis import RedisIntegration
 
 
 class Settings(BaseSettings):
@@ -27,5 +28,6 @@ if settings.SENTRY_DSN:
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         environment=settings.ENV,
+        integrations=[RedisIntegration()],
         traces_sample_rate=1.0,
     )

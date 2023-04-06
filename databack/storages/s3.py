@@ -1,3 +1,5 @@
+import os
+
 import aioboto3
 import aiofiles
 from pydantic import BaseModel
@@ -12,7 +14,7 @@ class S3Options(BaseModel):
     region_name: str | None
     bucket_name: str
     endpoint_url: str
-    path: str | None
+    path: str = ""
 
 
 class S3(Base):
@@ -45,8 +47,8 @@ class S3(Base):
     async def upload(self, file: str):
         async with self.session.client("s3", endpoint_url=self.endpoint_url) as s3:
             async with aiofiles.open(file, "rb") as f:
-                await s3.put_object(Key=file, Body=f, Bucket=self.bucket_name)
-                return f"{self.bucket_name}/{file}"
+                key = os.path.join(self.path, os.path.basename(file))
+                return await s3.put_object(Key=key, Body=await f.read(), Bucket=self.bucket_name)
 
     async def download(self, file: str):
         async with self.session.client("s3", endpoint_url=self.endpoint_url) as s3:

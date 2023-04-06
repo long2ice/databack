@@ -40,6 +40,5 @@ class Base:
     async def get_backup(self):
         backup = await self.backup()
         if self.compress:
-            name = os.path.basename(backup)
-            return await aioshutil.make_archive(name, "gztar", root_dir=os.path.dirname(backup))
+            return await aioshutil.make_archive(backup, "gztar", root_dir=os.path.dirname(backup))
         return backup
