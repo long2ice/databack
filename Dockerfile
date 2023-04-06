@@ -13,9 +13,9 @@ RUN git clone https://github.com/long2ice/databack-web.git /databack-web
 WORKDIR /databack-web
 RUN npm install && npm run build
 
-FROM python:3.11-slim
+FROM snakepacker/python:3.11
 WORKDIR /databack
-RUN apt update -y && apt install -y default-mysql-client postgresql-client
+RUN apt update -y && apt install -y mysql-client postgresql-client
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY --from=builder /databack /databack
