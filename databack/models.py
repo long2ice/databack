@@ -1,4 +1,5 @@
-from tortoise import Model, fields
+from crontab import CronTab
+from tortoise import Model, fields, timezone
 
 from databack.enums import DataSourceType, StorageType, TaskStatus
 from databack.storages.s3 import S3Options
@@ -49,6 +50,14 @@ class Task(BaseModel):
     enabled = fields.BooleanField(default=True)
     sub_path = fields.CharField(max_length=255, default="")
     cron = fields.CharField(max_length=255, validators=[CronValidator()])
+    next_run_at = fields.DatetimeField(null=True)
+
+    async def refresh_next_run_at(self):
+        cron = CronTab(self.cron)
+        next_time = cron.next(default_utc=True, return_datetime=True)
+        next_time = timezone.make_aware(next_time)
+        self.next_run_at = next_time
+        await self.save(update_fields=["next_run_at"])
 
 
 class TaskLog(BaseModel):

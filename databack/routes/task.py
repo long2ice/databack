@@ -55,6 +55,7 @@ async def get_tasks(
             "data_source_id",
             "storage_id",
             "sub_path",
+            "next_run_at",
             storage_name="storage__name",
             data_source_name="data_source__name",
         )
