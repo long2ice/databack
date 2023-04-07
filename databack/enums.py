@@ -12,6 +12,8 @@ class DataSourceType(str, Enum):
     postgres = "postgres"
     local = "local"
     ssh = "ssh"
+    mongo = "mongo"
+    redis = "redis"
 
 
 class TaskStatus(str, Enum):

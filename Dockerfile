@@ -4,7 +4,9 @@ WORKDIR /databack-web
 RUN npm install && npm run build
 
 FROM snakepacker/python:3.11
-RUN apt update -y && apt install -y mysql-client curl
+RUN apt update -y && apt install -y mysql-client curl redis-tools
+RUN curl -o mongo.deb https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2204-x86_64-100.7.0.deb
+RUN dpkg -i mongo.deb && rm mongo.deb
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 RUN curl -o /etc/apt/trusted.gpg.d/pgdg.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
 RUN apt update -y && apt install -y postgresql-client

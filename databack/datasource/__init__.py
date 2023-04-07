@@ -23,6 +23,7 @@ class Base:
     async def check(self):
         raise NotImplementedError
 
+    @abc.abstractmethod
     async def backup(self):
         raise NotImplementedError
 

@@ -14,6 +14,8 @@ async def get_task_logs(
     limit: int = 10,
     offset: int = 0,
     task_id: int | None = None,
+    data_source_id: int | None = None,
+    storage_id: int | None = None,
     status: str | None = None,
     started_at: datetime | None = None,
     ended_at: datetime | None = None,
@@ -30,6 +32,10 @@ async def get_task_logs(
         qs = qs.filter(ended_at__lte=ended_at)
     if is_deleted is not None:
         qs = qs.filter(is_deleted=is_deleted)
+    if data_source_id:
+        qs = qs.filter(task__data_source_id=data_source_id)
+    if storage_id:
+        qs = qs.filter(task__storage_id=storage_id)
     total = await qs.count()
     data = await qs.order_by("-id").limit(limit).offset(offset)
     return {"total": total, "data": data}
