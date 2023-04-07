@@ -2,6 +2,7 @@ import asyncio
 
 from crontab import CronTab
 from loguru import logger
+from tortoise import timezone
 
 from databack.constants import SCHEDULER_SLEEP_SECONDS
 from databack.models import Task
@@ -20,12 +21,13 @@ class Scheduler:
                 tasks = await Task.filter(enabled=True).only("id", "cron").all()
                 for task in tasks:
                     cron = CronTab(task.cron)
-                    next_time = cron.next(default_utc=True)
-                    if next_time <= 0:
+                    next_time = cron.next(default_utc=True, return_datetime=True)
+                    next_time = timezone.make_aware(next_time)
+                    if next_time <= timezone.now():
                         logger.info(f"Run task {task.name} now!")
                         await run_task.delay(task.pk)
                     else:
-                        wait_seconds.append(next_time)
+                        wait_seconds.append(next_time.timestamp() - timezone.now().timestamp())
             except Exception as e:
                 logger.error(f"Scheduler error: {e}")
             min_wait_seconds = min(wait_seconds) if wait_seconds else SCHEDULER_SLEEP_SECONDS
