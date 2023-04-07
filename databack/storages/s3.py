@@ -14,7 +14,6 @@ class S3Options(BaseModel):
     region_name: str | None
     bucket_name: str
     endpoint_url: str
-    path: str = ""
 
 
 class S3(Base):
@@ -24,16 +23,18 @@ class S3(Base):
     def __init__(
         self,
         options: S3Options,
+        path: str = "",
     ):
         super().__init__(
             options=options,
+            path=path,
         )
         self.endpoint_url = options.endpoint_url
         self.access_key_id = options.access_key_id
         self.secret_access_key = options.secret_access_key
         self.region_name = options.region_name
         self.bucket_name = options.bucket_name
-        self.path = options.path
+        self.path = path
         self.session = aioboto3.Session(
             aws_access_key_id=self.access_key_id,
             aws_secret_access_key=self.secret_access_key,
@@ -48,7 +49,8 @@ class S3(Base):
         async with self.session.client("s3", endpoint_url=self.endpoint_url) as s3:
             async with aiofiles.open(file, "rb") as f:
                 key = os.path.join(self.path, os.path.basename(file))
-                return await s3.put_object(Key=key, Body=await f.read(), Bucket=self.bucket_name)
+                await s3.put_object(Key=key, Body=await f.read(), Bucket=self.bucket_name)
+                return key
 
     async def download(self, file: str):
         async with self.session.client("s3", endpoint_url=self.endpoint_url) as s3:

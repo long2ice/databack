@@ -54,6 +54,7 @@ async def get_tasks(
             "compress",
             "data_source_id",
             "storage_id",
+            "sub_path",
             storage_name="storage__name",
             data_source_name="data_source__name",
         )
@@ -69,6 +70,7 @@ class CreateTaskRequest(BaseModel):
     keep_num: int = 0
     keep_days: int = 0
     enabled: bool = True
+    sub_path: str = ""
     cron: str = Field(..., example="0 0 * * *")
 
 
@@ -94,6 +96,7 @@ class UpdateTaskRequest(BaseModel):
     storage_id: int | None
     keep_num: int | None
     keep_days: int | None
+    sub_path: str | None
     enabled: bool | None
     cron: str | None
 

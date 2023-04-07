@@ -8,7 +8,6 @@ from databack.storages import Base
 
 
 class SSHOptions(BaseModel):
-    path: str
     host: str
     port: int
     username: str
@@ -24,11 +23,12 @@ class SSH(Base):
     def __init__(
         self,
         options: SSHOptions,
+        path: str = "",
     ):
         super().__init__(
             options=options,
+            path=path,
         )
-        self.path = options.path
         self.host = options.host
         self.port = options.port
         self.username = options.username

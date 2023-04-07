@@ -1,7 +1,9 @@
+import os.path
 from datetime import timedelta
 
 from loguru import logger
 from rearq import ReArq
+from rearq.constants import JOB_TIMEOUT_UNLIMITED
 from tortoise import Tortoise, timezone
 
 from databack.discover import get_data_source, get_storage
@@ -34,7 +36,7 @@ async def shutdown():
     await Tortoise.close_connections()
 
 
-@rearq.task()
+@rearq.task(job_timeout=JOB_TIMEOUT_UNLIMITED)
 async def run_task(pk: int):
     started_at = timezone.now()
     task = await Task.get(pk=pk, enabled=True).select_related("data_source", "storage")
@@ -48,13 +50,17 @@ async def run_task(pk: int):
     data_source_cls = get_data_source(data_source.type)
     data_source_obj = data_source_cls(compress=task.compress, **data_source.options)  # type: ignore
     storage_cls = get_storage(storage.type)
-    storage_obj = storage_cls(storage.options_parsed)  # type: ignore
+    storage_path = storage.path
+    sub_path = task.sub_path
+    storage_obj = storage_cls(
+        options=storage.options_parsed, path=os.path.join(storage_path, sub_path)
+    )
     try:
         backup = await data_source_obj.get_backup()
-        await storage_obj.upload(backup)
+        file = await storage_obj.upload(backup)
         await storage_obj.delete(backup)
         task_log.status = TaskStatus.success
-        task_log.path = backup
+        task_log.path = file
         task_log.size = await get_file_size(backup)
         task_log.end_at = timezone.now()
     except Exception as e:

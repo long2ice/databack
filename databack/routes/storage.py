@@ -6,7 +6,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_
 from databack import discover
 from databack.enums import StorageType
 from databack.models import Storage
-from databack.storages import local, s3, ssh
+from databack.storages import s3, ssh
 
 router = APIRouter()
 
@@ -49,15 +49,14 @@ async def get_storage(pk: int):
 class CreateStorageRequest(BaseModel):
     type: StorageType = Field(..., example="local")
     name: str = Field(..., example="local")
-    options: s3.S3Options | ssh.SSHOptions | local.LocalOptions = Field(
-        ..., example={"path": "/tmp"}
-    )
+    path: str = Field(..., example="/data")
+    options: s3.S3Options | ssh.SSHOptions | None = Field(...)
 
 
 @router.post("", status_code=HTTP_201_CREATED)
 async def create_storage(body: CreateStorageRequest):
     storage_cls = discover.get_storage(body.type)
-    storage_obj = storage_cls(body.options)
+    storage_obj = storage_cls(options=body.options, path=body.path)  # type: ignore
     if not await storage_obj.check():
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Storage check failed")
     await Storage.create(**body.dict())
@@ -66,14 +65,17 @@ async def create_storage(body: CreateStorageRequest):
 class UpdateStorageRequest(BaseModel):
     type: StorageType | None
     name: str | None
-    options: s3.S3Options | ssh.SSHOptions | local.LocalOptions | None
+    path: str | None
+    options: s3.S3Options | ssh.SSHOptions | None
 
 
 @router.patch("/{pk}", status_code=HTTP_204_NO_CONTENT)
 async def update_storage(pk: int, body: UpdateStorageRequest):
     storage = await Storage.get(id=pk)
     storage_cls = discover.get_storage(storage.type)
-    storage_obj = storage_cls(storage.options_parsed)
+    storage_obj = storage_cls(
+        options=body.options or storage.options_parsed, path=body.path or storage.path
+    )
     if not await storage_obj.check():
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Storage check failed")
     await Storage.filter(id=pk).update(**body.dict(exclude_none=True))
