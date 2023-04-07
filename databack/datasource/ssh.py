@@ -22,26 +22,27 @@ class SSH(Base):
 
     async def check(self):
         async with self._get_connection() as conn:
-            return await conn.run("ls", self.path, check=True)
+            return await conn.run(f"ls {self.path}", check=True)
 
     def _get_connection(self):
+        private_key = asyncssh.import_private_key(self.private_key, self.private_key_pass)
         return asyncssh.connect(
             self.host,
             port=self.port,
             username=self.username,
             password=self.password,
-            client_keys=[self.private_key],
-            passphrase=self.private_key_pass,
+            client_keys=private_key,
+            known_hosts=None,
         )
 
     async def backup(self):
         temp_dir = tempfile.mkdtemp()
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
-                await sftp.get(self.path, temp_dir)
+                await sftp.get(self.path, temp_dir, recurse=True)
         return os.path.join(temp_dir, os.path.basename(self.path))
 
     async def restore(self, file: str):
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
-                await sftp.put(file, self.path)
+                await sftp.put(file, self.path, recurse=True)

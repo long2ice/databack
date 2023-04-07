@@ -41,13 +41,14 @@ class SSH(Base):
             return await conn.run("ls", self.path, check=True)
 
     def _get_connection(self):
+        private_key = asyncssh.import_private_key(self.private_key, self.private_key_pass)
         return asyncssh.connect(
             self.host,
             port=self.port,
             username=self.username,
             password=self.password,
-            client_keys=[self.private_key],
-            passphrase=self.private_key_pass,
+            known_hosts=None,
+            client_keys=private_key,
         )
 
     async def upload(self, file: str):
