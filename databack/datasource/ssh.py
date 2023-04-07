@@ -37,10 +37,11 @@ class SSH(Base):
 
     async def backup(self):
         temp_dir = tempfile.mkdtemp()
+        destination = os.path.join(temp_dir, self.filename)
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
-                await sftp.get(self.path, temp_dir, recurse=True)
-        return os.path.join(temp_dir, os.path.basename(self.path))
+                await sftp.get(self.path, destination, recurse=True)
+        return destination
 
     async def restore(self, file: str):
         async with self._get_connection() as conn:

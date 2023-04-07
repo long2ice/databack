@@ -27,7 +27,7 @@ async def get_storages(
         qs = qs.filter(type=type)
     total = await qs.count()
     storages = (
-        await qs.only("id", "name", "type", "created_at", "updated_at")
+        await qs.only("id", "name", "type", "path", "created_at", "updated_at")
         .order_by("-id")
         .limit(limit)
         .offset(offset)

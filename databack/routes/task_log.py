@@ -40,7 +40,7 @@ async def delete_task_log(pk: int):
     log = await TaskLog.get(id=pk).select_related("task__storage")
     storage = log.task.storage
     storage_cls = get_storage(storage.type)
-    storage_obj = storage_cls(storage.options_parsed)  # type: ignore
+    storage_obj = storage_cls(options=storage.options_parsed, path=storage.path)  # type: ignore
     if log.status == TaskStatus.success:
         await storage_obj.delete(log.path)
     await log.delete()

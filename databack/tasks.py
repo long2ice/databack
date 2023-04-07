@@ -57,11 +57,11 @@ async def run_task(pk: int):
     )
     try:
         backup = await data_source_obj.get_backup()
+        task_log.size = await get_file_size(backup)
         file = await storage_obj.upload(backup)
         await storage_obj.delete(backup)
         task_log.status = TaskStatus.success
         task_log.path = file
-        task_log.size = await get_file_size(backup)
         task_log.end_at = timezone.now()
     except Exception as e:
         logger.exception(e)

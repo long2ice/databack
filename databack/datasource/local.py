@@ -1,3 +1,5 @@
+import tempfile
+
 import aiofiles.ospath
 import aioshutil
 
@@ -16,7 +18,10 @@ class Local(Base):
         return await aiofiles.ospath.exists(self.path)
 
     async def backup(self):
-        return self.path
+        temp_dir = tempfile.mkdtemp()
+        destination = f"{temp_dir}/{self.filename}"
+        await aioshutil.copytree(self.path, destination)
+        return destination
 
     async def restore(self, file: str):
         await aioshutil.move(file, self.path)
