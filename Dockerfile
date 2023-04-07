@@ -4,7 +4,10 @@ WORKDIR /databack-web
 RUN npm install && npm run build
 
 FROM snakepacker/python:3.11
-RUN apt update -y && apt install -y mysql-client postgresql-client curl
+RUN apt update -y && apt install -y mysql-client curl
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN curl -o /etc/apt/trusted.gpg.d/pgdg.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+RUN apt update -y && apt install -y postgresql-client
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 RUN mkdir -p /databack
 WORKDIR /databack

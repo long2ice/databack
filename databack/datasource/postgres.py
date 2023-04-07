@@ -27,7 +27,7 @@ class Postgres(Base):
         options = [f"{k}={v}" for k, v in self.options.items()]
         temp_dir = tempfile.mkdtemp()
         file = f"{temp_dir}/{self.filename}.sql"
-        options.append(f"-f {file}")
+        options.append(f"--file={file}")
         proc = await asyncio.create_subprocess_exec(
             self.backup_program,
             *options,
@@ -37,7 +37,9 @@ class Postgres(Base):
         )
         stdout, stderr = await proc.communicate()
         if proc.returncode != 0:
-            raise RuntimeError(f"pg_dump failed with {proc.returncode}: {stderr.decode()}")
+            raise RuntimeError(
+                f"{self.backup_program} failed with {proc.returncode}: {stderr.decode()}"
+            )
         return file
 
     async def restore(self, file: str):
