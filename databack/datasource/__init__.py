@@ -1,9 +1,9 @@
 import abc
 import os.path
 import tempfile
-from datetime import datetime
 
 import aioshutil
+from tortoise import timezone
 
 from databack.enums import DataSourceType
 
@@ -17,7 +17,7 @@ class Base:
 
     @property
     def filename(self):
-        return f'{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}'
+        return f'{timezone.now().strftime("%Y-%m-%d_%H-%M-%S")}'
 
     @abc.abstractmethod
     async def check(self):

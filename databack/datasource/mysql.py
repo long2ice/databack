@@ -14,7 +14,12 @@ class MySQL(Base):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.options = [f"{k}={v}" for k, v in self.kwargs.items()]
+        self.options = []
+        for k, v in self.kwargs.items():
+            if v is True:
+                self.options.append(k)
+            else:
+                self.options.append(f"{k}={v}")
 
     async def check(self):
         if not await aioshutil.which("mysqlpump"):

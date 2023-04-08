@@ -14,7 +14,12 @@ class Postgres(Base):
 
     def __init__(self, password: str, backup_program: str, **kwargs):
         super().__init__(**kwargs)
-        self.options = self.kwargs
+        self.options = []
+        for k, v in self.kwargs.items():
+            if v is True:
+                self.options.append(k)
+            else:
+                self.options.append(f"{k}={v}")
         self.password = password
         self.backup_program = backup_program
 
@@ -24,9 +29,9 @@ class Postgres(Base):
         return True
 
     async def backup(self):
-        options = [f"{k}={v}" for k, v in self.options.items()]
         temp_dir = tempfile.mkdtemp()
         file = f"{temp_dir}/{self.filename}.sql"
+        options = self.options
         options.append(f"--file={file}")
         proc = await asyncio.create_subprocess_exec(
             self.backup_program,
