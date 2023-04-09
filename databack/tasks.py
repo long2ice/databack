@@ -1,6 +1,8 @@
 import os.path
+import tempfile
 from datetime import timedelta
 
+import aioshutil
 from loguru import logger
 from rearq import ReArq
 from rearq.constants import JOB_TIMEOUT_UNLIMITED
@@ -8,7 +10,7 @@ from tortoise import Tortoise, timezone
 
 from databack.discover import get_data_source, get_storage
 from databack.enums import TaskStatus
-from databack.models import Task, TaskLog
+from databack.models import RestoreLog, Task, TaskLog
 from databack.settings import settings
 from databack.utils import get_file_size
 
@@ -37,7 +39,7 @@ async def shutdown():
 
 
 @rearq.task(job_timeout=JOB_TIMEOUT_UNLIMITED)
-async def run_task(pk: int):
+async def run_backup(pk: int):
     started_at = timezone.now()
     task = await Task.get(pk=pk, enabled=True).select_related("data_source", "storage")
     task_log = await TaskLog.create(
@@ -80,3 +82,33 @@ async def run_task(pk: int):
                 task_log_to_be_deleted.is_deleted = True
                 await task_log_to_be_deleted.save(update_fields=["is_deleted"])
     return task_log.pk
+
+
+@rearq.task(job_timeout=JOB_TIMEOUT_UNLIMITED)
+async def run_restore(pk: int):
+    restore_log = await RestoreLog.get(pk=pk).select_related(
+        "task_log__task__data_source", "task_log__task__storage"
+    )
+    task_log = restore_log.task_log  # type: TaskLog
+    task = task_log.task
+    if task_log.is_deleted or task_log.status != TaskStatus.success:
+        return "TaskLog is deleted or not success"
+    data_source = task_log.task.data_source
+    storage = task_log.task.storage
+    data_source_cls = get_data_source(data_source.type)
+    data_source_obj = data_source_cls(compress=task.compress, **restore_log.options)  # type: ignore
+    storage_cls = get_storage(storage.type)
+    local_path = tempfile.mkdtemp()
+    try:
+        local_file = os.path.join(local_path, os.path.basename(task_log.path))
+        storage_obj = storage_cls(options=storage.options_parsed, path=local_file)
+        await storage_obj.download(task_log.path)
+        await data_source_obj.restore(local_file)
+        await aioshutil.rmtree(local_path)
+        restore_log.status = TaskStatus.success
+    except Exception as e:
+        logger.exception(e)
+        restore_log.status = TaskStatus.failed
+        restore_log.message = str(e)
+    restore_log.end_at = timezone.now()
+    await restore_log.save()

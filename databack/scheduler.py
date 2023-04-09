@@ -6,7 +6,7 @@ from tortoise import timezone
 
 from databack.constants import SCHEDULER_SLEEP_SECONDS
 from databack.models import Task
-from databack.tasks import run_task
+from databack.tasks import run_backup
 
 
 class Scheduler:
@@ -26,7 +26,7 @@ class Scheduler:
                         await task.refresh_next_run_at()
                     if task.next_run_at <= timezone.now():
                         logger.info(f"Run task {task.name} now!")
-                        await run_task.delay(task.id)
+                        await run_backup.delay(task.id)
                         await task.refresh_next_run_at()
                     cron = CronTab(task.cron)
                     seconds = cron.next(default_utc=True)

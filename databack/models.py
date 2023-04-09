@@ -69,3 +69,12 @@ class TaskLog(BaseModel):
     is_deleted = fields.BooleanField(default=False)
     start_at = fields.DatetimeField()
     end_at = fields.DatetimeField(null=True)
+
+
+class RestoreLog(BaseModel):
+    task_log: fields.ForeignKeyRelation[TaskLog] = fields.ForeignKeyField("models.TaskLog")
+    message = fields.TextField(null=True)
+    options = fields.JSONField()
+    status = fields.CharEnumField(TaskStatus, default=TaskStatus.running)
+    start_at = fields.DatetimeField()
+    end_at = fields.DatetimeField(null=True)

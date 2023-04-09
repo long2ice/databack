@@ -17,6 +17,8 @@ class Mongo(Base):
     async def check(self):
         if not await aioshutil.which("mongodump"):
             raise RuntimeError("mongodump not found in PATH")
+        if not await aioshutil.which("mongorestore"):
+            raise RuntimeError("mongorestore not found in PATH")
         return True
 
     async def backup(self):
@@ -35,4 +37,15 @@ class Mongo(Base):
         return temp_dir
 
     async def restore(self, file: str):
-        raise NotImplementedError
+        file = await self.get_restore(file)
+        options = self.options
+        options.append(file)
+        proc = await asyncio.create_subprocess_exec(
+            "mongorestore",
+            *options,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError(f"mongorestore failed with {proc.returncode}: {stderr.decode()}")

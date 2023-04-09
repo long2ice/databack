@@ -60,7 +60,7 @@ class SSH(Base):
     async def download(self, file: str):
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
-                await sftp.get(self.path, file)
+                await sftp.get(file, self.path)
 
     async def delete(self, file: str):
         async with self._get_connection() as conn:

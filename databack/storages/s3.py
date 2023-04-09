@@ -54,7 +54,7 @@ class S3(Base):
 
     async def download(self, file: str):
         async with self.session.client("s3", endpoint_url=self.endpoint_url) as s3:
-            await s3.download_file(file, self.path, Bucket=self.bucket_name)
+            await s3.download_file(Key=file, Filename=self.path, Bucket=self.bucket_name)
 
     async def delete(self, file: str):
         async with self.session.client("s3", endpoint_url=self.endpoint_url) as s3:

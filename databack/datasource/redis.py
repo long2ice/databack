@@ -36,4 +36,15 @@ class Redis(Base):
         return file
 
     async def restore(self, file: str):
-        raise NotImplementedError
+        file = await self.get_restore(file)
+        options = self.options
+        options.append(f"RESTORE {file}")
+        proc = await asyncio.create_subprocess_exec(
+            "redis-cli",
+            *options,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError(f"redis-cli failed with {proc.returncode}: {stderr.decode()}")

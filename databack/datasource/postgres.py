@@ -3,7 +3,6 @@ import tempfile
 
 import aiofiles
 import aioshutil
-from loguru import logger
 
 from databack.datasource import Base
 from databack.enums import DataSourceType
@@ -12,7 +11,7 @@ from databack.enums import DataSourceType
 class Postgres(Base):
     type = DataSourceType.postgres
 
-    def __init__(self, password: str, backup_program: str, **kwargs):
+    def __init__(self, password: str, backup_program: str | None = None, **kwargs):
         super().__init__(**kwargs)
         self.options = []
         for k, v in self.kwargs.items():
@@ -26,6 +25,8 @@ class Postgres(Base):
     async def check(self):
         if not await aioshutil.which(self.backup_program):
             raise ValueError(f"{self.backup_program} not found in PATH")
+        if not await aioshutil.which("psql"):
+            raise RuntimeError("psql not found in PATH")
         return True
 
     async def backup(self):
@@ -48,23 +49,19 @@ class Postgres(Base):
         return file
 
     async def restore(self, file: str):
-        if not await aioshutil.which("pg_restore"):
-            raise RuntimeError("pg_restore not found in PATH")
         file = await self.get_restore(file)
         options = self.options
+        options.append(f"--file={file}")
         proc = await asyncio.create_subprocess_exec(
-            "pg_restore",
+            "/usr/local/opt/postgresql@15/bin/psql",
             *options,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             stdin=asyncio.subprocess.PIPE,
+            env={"PGPASSWORD": self.password},
         )
         async with aiofiles.open(file, "r") as f:
             content = await f.read()
         stdout, stderr = await proc.communicate(content.encode())
         if proc.returncode != 0:
             raise RuntimeError(f"pg_restore failed with {proc.returncode}: {stderr.decode()}")
-        if stdout:
-            logger.info(stdout.decode())
-        if stderr:
-            logger.info(stderr.decode())

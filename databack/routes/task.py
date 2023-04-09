@@ -88,7 +88,7 @@ async def run_task(pk: int):
             status_code=HTTP_400_BAD_REQUEST,
             detail=i18n.t("task_disabled", name=task.name),
         )
-    await tasks.run_task.delay(pk)
+    await tasks.run_backup.delay(pk)
 
 
 class UpdateTaskRequest(BaseModel):

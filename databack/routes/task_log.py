@@ -37,7 +37,23 @@ async def get_task_logs(
     if storage_id:
         qs = qs.filter(task__storage_id=storage_id)
     total = await qs.count()
-    data = await qs.order_by("-id").limit(limit).offset(offset)
+    data = (
+        await qs.order_by("-id")
+        .limit(limit)
+        .offset(offset)
+        .values(
+            "id",
+            "task_id",
+            "status",
+            "path",
+            "size",
+            "message",
+            "is_deleted",
+            "start_at",
+            "end_at",
+            data_source_type="task__data_source__type",
+        )
+    )
     return {"total": total, "data": data}
 
 
