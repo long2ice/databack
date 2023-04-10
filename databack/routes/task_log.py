@@ -52,6 +52,8 @@ async def get_task_logs(
             "start_at",
             "end_at",
             data_source_type="task__data_source__type",
+            data_source_name="task__data_source__name",
+            storage_name="task__storage__name",
         )
     )
     return {"total": total, "data": data}
