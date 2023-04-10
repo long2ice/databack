@@ -74,6 +74,7 @@ class TaskLog(BaseModel):
 class RestoreLog(BaseModel):
     task_log: fields.ForeignKeyRelation[TaskLog] = fields.ForeignKeyField("models.TaskLog")
     message = fields.TextField(null=True)
+    restore_type = fields.CharEnumField(DataSourceType)
     options = fields.JSONField()
     status = fields.CharEnumField(TaskStatus, default=TaskStatus.running)
     start_at = fields.DatetimeField()

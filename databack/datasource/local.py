@@ -24,4 +24,5 @@ class Local(Base):
         return destination
 
     async def restore(self, file: str):
+        file = await self.get_restore(file)
         await aioshutil.move(file, self.path)

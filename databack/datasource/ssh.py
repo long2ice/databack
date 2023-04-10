@@ -44,6 +44,7 @@ class SSH(Base):
         return destination
 
     async def restore(self, file: str):
+        file = await self.get_restore(file)
         async with self._get_connection() as conn:
             async with conn.start_sftp_client() as sftp:
                 await sftp.put(file, self.path, recurse=True)

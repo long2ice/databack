@@ -86,16 +86,13 @@ async def run_backup(pk: int):
 
 @rearq.task(job_timeout=JOB_TIMEOUT_UNLIMITED)
 async def run_restore(pk: int):
-    restore_log = await RestoreLog.get(pk=pk).select_related(
-        "task_log__task__data_source", "task_log__task__storage"
-    )
+    restore_log = await RestoreLog.get(pk=pk).select_related("task_log__task__storage")
     task_log = restore_log.task_log  # type: TaskLog
     task = task_log.task
     if task_log.is_deleted or task_log.status != TaskStatus.success:
         return "TaskLog is deleted or not success"
-    data_source = task_log.task.data_source
     storage = task_log.task.storage
-    data_source_cls = get_data_source(data_source.type)
+    data_source_cls = get_data_source(restore_log.restore_type)
     data_source_obj = data_source_cls(compress=task.compress, **restore_log.options)  # type: ignore
     storage_cls = get_storage(storage.type)
     local_path = tempfile.mkdtemp()

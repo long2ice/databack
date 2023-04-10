@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from tortoise.expressions import RawSQL
 from tortoise.functions import Count
 
-from databack.models import DataSource, Storage, Task, TaskLog, RestoreLog
+from databack.models import DataSource, RestoreLog, Storage, Task, TaskLog
 
 router = APIRouter()
 

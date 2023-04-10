@@ -4,7 +4,7 @@ from starlette.status import HTTP_201_CREATED
 from tortoise import timezone
 from tortoise.contrib.pydantic import pydantic_model_creator
 
-from databack.enums import TaskStatus
+from databack.enums import DataSourceType, TaskStatus
 from databack.models import RestoreLog
 from databack.tasks import run_restore
 
@@ -22,6 +22,7 @@ class GetRestoreResponse(BaseModel):
 class RestoreRequest(BaseModel):
     options: dict
     task_log_id: int
+    restore_type: DataSourceType
 
 
 @router.get("", response_model=GetRestoreResponse)
@@ -40,6 +41,7 @@ async def restore_task_log(req: RestoreRequest):
         task_log_id=req.task_log_id,
         start_at=timezone.now(),
         options=req.options,
+        restore_type=req.restore_type,
     )
     await run_restore.delay(log.pk)
 

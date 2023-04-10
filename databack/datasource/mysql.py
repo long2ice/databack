@@ -27,6 +27,10 @@ class MySQL(Base):
             raise RuntimeError("mysql not found in PATH")
         return True
 
+    def _check_error(self, std):
+        if std and "[ERROR]" in std.decode():
+            raise RuntimeError(f"mysqlpump failed: {std.decode()}")
+
     async def backup(self):
         temp_dir = tempfile.mkdtemp()
         options = self.options
@@ -41,6 +45,8 @@ class MySQL(Base):
         stdout, stderr = await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError(f"mysqlpump failed with {proc.returncode}: {stderr.decode()}")
+        self._check_error(stdout)
+        self._check_error(stderr)
         return file
 
     async def restore(self, file: str):
@@ -58,3 +64,5 @@ class MySQL(Base):
         stdout, stderr = await proc.communicate(content.encode())
         if proc.returncode != 0:
             raise RuntimeError(f"mysql failed with {proc.returncode}: {stderr.decode()}")
+        self._check_error(stdout)
+        self._check_error(stderr)
