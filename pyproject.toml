@@ -12,7 +12,7 @@ tortoise-orm = { version = "*", extras = ["all"] }
 sentry-sdk = { version = "*", extras = ["fastapi"] }
 loguru = "*"
 aerich = "*"
-asyncmy = "*"
+asyncmy = {version = "^0.2.8rc1", allow-prereleases = true}
 asyncpg = "*"
 rearq = { git = "https://github.com/long2ice/rearq.git", branch = "dev" }
 aioshutil = "*"

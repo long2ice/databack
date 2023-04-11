@@ -61,7 +61,7 @@ async def run_backup(pk: int):
         backup = await data_source_obj.get_backup()
         task_log.size = await get_file_size(backup)
         file = await storage_obj.upload(backup)
-        await storage_obj.delete(backup)
+        await aioshutil.rmtree(os.path.dirname(backup))
         task_log.status = TaskStatus.success
         task_log.path = file
         task_log.end_at = timezone.now()

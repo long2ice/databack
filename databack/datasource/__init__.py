@@ -35,11 +35,15 @@ class Base:
         if self.compress:
             temp_dir = tempfile.mkdtemp()
             await aioshutil.unpack_archive(file, temp_dir)
-            return os.path.join(temp_dir, os.path.basename(file).replace(".tar.gz", ""))
+            ret = os.path.join(temp_dir, os.path.basename(file).replace(".tar.gz", ""))
+            await aioshutil.rmtree(os.path.dirname(file))
+            return ret
         return file
 
     async def get_backup(self):
         backup = await self.backup()
         if self.compress:
-            return await aioshutil.make_archive(backup, "gztar", root_dir=os.path.dirname(backup))
+            ret = await aioshutil.make_archive(backup, "gztar", root_dir=os.path.dirname(backup))
+            await aioshutil.rmtree(os.path.dirname(backup))
+            return ret
         return backup
