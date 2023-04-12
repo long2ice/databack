@@ -1,6 +1,7 @@
 import abc
 import os.path
 import tempfile
+from pathlib import Path
 
 import aioshutil
 from tortoise import timezone
@@ -36,7 +37,7 @@ class Base:
             temp_dir = tempfile.mkdtemp()
             await aioshutil.unpack_archive(file, temp_dir)
             ret = os.path.join(temp_dir, os.path.basename(file).replace(".tar.gz", ""))
-            await aioshutil.rmtree(os.path.dirname(file))
+            Path.unlink(file)
             return ret
         return file
 
@@ -44,6 +45,6 @@ class Base:
         backup = await self.backup()
         if self.compress:
             ret = await aioshutil.make_archive(backup, "gztar", root_dir=os.path.dirname(backup))
-            await aioshutil.rmtree(os.path.dirname(backup))
+            Path.unlink(backup)
             return ret
         return backup
