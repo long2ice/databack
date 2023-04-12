@@ -14,15 +14,15 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/ap
 RUN curl -o /etc/apt/trusted.gpg.d/pgdg.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
 RUN apt update -y && apt install -y postgresql-client
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
-RUN mkdir -p /databack
-WORKDIR /databack
-COPY pyproject.toml poetry.lock /databack/
 ENV POETRY_VIRTUALENVS_CREATE false
-RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.11 get-pip.py && pip3.11 install poetry && poetry install --no-root
-COPY . /databack
-RUN poetry install
+RUN mkdir -p /databack
 COPY --from=frontend-builder /databack-web/dist /databack/static
 COPY --from=mongo-tools-builder /mongo-tools/bin/mongodump /usr/bin/mongodump
 COPY --from=mongo-tools-builder /mongo-tools/bin/mongorestore /usr/bin/mongorestore
+WORKDIR /databack
+COPY pyproject.toml poetry.lock /databack/
+RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.11 get-pip.py && pip3.11 install poetry && poetry install --no-root
+COPY . /databack
+RUN poetry install
 ENTRYPOINT ["uvicorn", "databack.app:app", "--host", "0.0.0.0"]
 CMD ["--port", "8000"]

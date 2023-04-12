@@ -27,7 +27,8 @@ class MySQL(Base):
             raise RuntimeError("mysql not found in PATH")
         return True
 
-    def _check_error(self, std):
+    @classmethod
+    def _check_error(cls, std: bytes):
         if std and "[ERROR]" in std.decode():
             raise RuntimeError(f"mysqlpump failed: {std.decode()}")
 
@@ -59,9 +60,9 @@ class MySQL(Base):
             stderr=asyncio.subprocess.PIPE,
             stdin=asyncio.subprocess.PIPE,
         )
-        async with aiofiles.open(file, "r") as f:
+        async with aiofiles.open(file, "rb") as f:
             content = await f.read()
-        stdout, stderr = await proc.communicate(content.encode())
+        stdout, stderr = await proc.communicate(content)
         if proc.returncode != 0:
             raise RuntimeError(f"mysql failed with {proc.returncode}: {stderr.decode()}")
         self._check_error(stdout)
