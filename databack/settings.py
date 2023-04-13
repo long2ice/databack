@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     ENV = "production"
     DB_URL: str
     REDIS_URL: str
+    WORKER: bool = True
 
     class Config:
         env_file = ".env"

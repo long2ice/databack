@@ -6,9 +6,3 @@ services:
     restart: always
     env_file: .env
     network_mode: host
-  worker:
-    image: databack
-    restart: always
-    env_file: .env
-    network_mode: host
-    entrypoint: rearq databack.tasks:rearq worker -t

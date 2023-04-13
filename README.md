@@ -33,12 +33,6 @@ services:
     env_file: .env
     network_mode: host
     image: ghcr.io/long2ice/databack/databack
-  worker:
-    restart: always
-    env_file: .env
-    network_mode: host
-    image: ghcr.io/long2ice/databack/databack
-    entrypoint: rearq databack.tasks:rearq worker -t
 ```
 
 ## Configuration
@@ -51,6 +45,25 @@ DEBUG = True
 REDIS_URL = redis://127.0.0.1:6379/0
 SENTRY_DSN = 'xxx'
 ENV = production
+WORKER = True
+```
+
+## Worker
+
+By default, `databack` will start a builtin worker to run tasks when environment variable `WORKER` is `True`. If you
+want to start multiple workers, you can run `rearq databack.tasks:rearq worker` command.
+
+For `docekr-compose` deployment:
+
+```yml
+version: "3"
+services:
+  worker:
+    restart: always
+    env_file: .env
+    network_mode: host
+    image: ghcr.io/long2ice/databack/databack
+    entrypoint: rearq databack.tasks:rearq worker -t
 ```
 
 ## Frontend

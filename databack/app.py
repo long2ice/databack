@@ -55,6 +55,8 @@ async def startup():
     await aerich.init()
     await aerich.upgrade()
     asyncio.ensure_future(Scheduler.start())
+    if settings.WORKER:
+        await rearq_server.start_worker()
 
 
 @app.on_event("shutdown")
