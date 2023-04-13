@@ -59,12 +59,14 @@ async def get_task_logs(
     return {"total": total, "data": data}
 
 
-@router.delete("/{pk}")
-async def delete_task_log(pk: int):
-    log = await TaskLog.get(id=pk).select_related("task__storage")
-    storage = log.task.storage
-    storage_cls = get_storage(storage.type)
-    storage_obj = storage_cls(options=storage.options_parsed, path=storage.path)  # type: ignore
-    if log.status == TaskStatus.success:
-        await storage_obj.delete(log.path)
-    await log.delete()
+@router.delete("/{pks}")
+async def delete_task_logs(pks: str):
+    pks = pks.split(",")
+    for pk in pks:
+        log = await TaskLog.get(id=pk).select_related("task__storage")
+        storage = log.task.storage
+        storage_cls = get_storage(storage.type)
+        storage_obj = storage_cls(options=storage.options_parsed, path=storage.path)  # type: ignore
+        if log.status == TaskStatus.success:
+            await storage_obj.delete(log.path)
+        await log.delete()
