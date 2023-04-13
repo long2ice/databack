@@ -101,6 +101,7 @@ async def update_datasource(pk: int, body: UpdateDataSourceRequest):
         )
 
 
-@router.delete("/{pk}", status_code=HTTP_204_NO_CONTENT)
-async def delete_datasource(pk: int):
-    await DataSource.filter(id=pk).delete()
+@router.delete("/{pks}", status_code=HTTP_204_NO_CONTENT)
+async def delete_datasource(pks: str):
+    id_list = [int(pk) for pk in pks.split(",")]
+    await DataSource.filter(id__in=id_list).delete()

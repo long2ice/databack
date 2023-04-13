@@ -81,6 +81,7 @@ async def update_storage(pk: int, body: UpdateStorageRequest):
     await Storage.filter(id=pk).update(**body.dict(exclude_none=True))
 
 
-@router.delete("/{pk}", status_code=HTTP_204_NO_CONTENT)
-async def delete_storage(pk: int):
-    await Storage.filter(id=pk).delete()
+@router.delete("/{pks}", status_code=HTTP_204_NO_CONTENT)
+async def delete_storage(pks: str):
+    id_list = [int(pk) for pk in pks.split(",")]
+    await Storage.filter(id__in=id_list).delete()

@@ -46,6 +46,7 @@ async def restore_task_log(req: RestoreRequest):
     await run_restore.delay(log.pk)
 
 
-@router.delete("/{pk}")
-async def delete_restore_log(pk: int):
-    await RestoreLog.filter(pk=pk).delete()
+@router.delete("/{pks}")
+async def delete_restore_log(pks: str):
+    id_list = [int(pk) for pk in pks.split(",")]
+    await RestoreLog.filter(id__in=id_list).delete()

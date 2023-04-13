@@ -61,8 +61,8 @@ async def get_task_logs(
 
 @router.delete("/{pks}")
 async def delete_task_logs(pks: str):
-    pk_list = pks.split(",")
-    for pk in pk_list:
+    id_list = [int(pk) for pk in pks.split(",")]
+    for pk in id_list:
         log = await TaskLog.get(id=pk).select_related("task__storage")
         storage = log.task.storage
         storage_cls = get_storage(storage.type)

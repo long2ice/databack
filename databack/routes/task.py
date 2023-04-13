@@ -107,8 +107,9 @@ async def update_task(pk: int, body: UpdateTaskRequest):
     await Task.filter(id=pk).update(**body.dict(exclude_none=True))
 
 
-@router.delete("/{pk}", status_code=HTTP_204_NO_CONTENT, dependencies=[Depends(refresh_scheduler)])
+@router.delete("/{pks}", status_code=HTTP_204_NO_CONTENT, dependencies=[Depends(refresh_scheduler)])
 async def delete_task(
-    pk: int,
+    pks: str,
 ):
-    await Task.filter(id=pk).delete()
+    ids = [int(pk) for pk in pks.split(",")]
+    await Task.filter(id__in=ids).delete()
