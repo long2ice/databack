@@ -15,7 +15,7 @@ from databack.exceptions import (
     validation_exception_handler,
 )
 from databack.log import init_logging
-from databack.routes import router
+from databack.route import router
 from databack.scheduler import Scheduler
 from databack.settings import TORTOISE_ORM, settings
 from databack.static import SPAStaticFiles

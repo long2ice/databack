@@ -1,18 +1,17 @@
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from databack.discover import get_storage
 from databack.enums import TaskStatus
 from databack.models import TaskLog
+from databack.schema.request import Query
 
 router = APIRouter()
 
 
 @router.get("")
 async def get_task_logs(
-    limit: int = 10,
-    offset: int = 0,
     task_id: int | None = None,
     data_source_id: int | None = None,
     storage_id: int | None = None,
@@ -20,6 +19,7 @@ async def get_task_logs(
     started_at: datetime | None = None,
     ended_at: datetime | None = None,
     is_deleted: bool | None = None,
+    query: Query = Depends(Query),
 ):
     qs = TaskLog.all()
     if task_id:
@@ -38,9 +38,9 @@ async def get_task_logs(
         qs = qs.filter(task__storage_id=storage_id)
     total = await qs.count()
     data = (
-        await qs.order_by("-id")
-        .limit(limit)
-        .offset(offset)
+        await qs.order_by(*query.orders)
+        .limit(query.limit)
+        .offset(query.offset)
         .values(
             "id",
             "task_id",

@@ -1,5 +1,5 @@
 import i18n
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
@@ -8,6 +8,7 @@ from tortoise.exceptions import IntegrityError
 from databack.discover import get_data_source
 from databack.enums import DataSourceType
 from databack.models import DataSource
+from databack.schema.request import Query
 
 router = APIRouter()
 
@@ -19,7 +20,11 @@ class GetDataSourceResponse(BaseModel):
 
 @router.get("", response_model=GetDataSourceResponse)
 async def get_datasource(
-    limit: int = 10, offset: int = 0, name: str = "", type: DataSourceType | None = None
+    limit: int = 10,
+    offset: int = 0,
+    name: str = "",
+    type: DataSourceType | None = None,
+    query: Query = Depends(Query),
 ):
     qs = DataSource.all()
     if name:
@@ -29,7 +34,7 @@ async def get_datasource(
     total = await qs.count()
     data = (
         await qs.only("id", "name", "type", "created_at", "updated_at")
-        .order_by("-id")
+        .order_by(*query.orders)
         .limit(limit)
         .offset(offset)
     )

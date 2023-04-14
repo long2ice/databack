@@ -7,6 +7,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 from databack import tasks
 from databack.depends import refresh_scheduler
 from databack.models import Task
+from databack.schema.request import Query
 
 router = APIRouter()
 
@@ -29,6 +30,9 @@ async def get_tasks(
     name: str = "",
     data_source_id: int | None = None,
     storage_id: int | None = None,
+    compress: bool | None = None,
+    enabled: bool | None = None,
+    query: Query = Depends(Query),
 ):
     qs = Task.all()
     if name:
@@ -37,9 +41,13 @@ async def get_tasks(
         qs = qs.filter(data_source_id=data_source_id)
     if storage_id:
         qs = qs.filter(storage_id=storage_id)
+    if compress is not None:
+        qs = qs.filter(compress=compress)
+    if enabled is not None:
+        qs = qs.filter(enabled=enabled)
     total = await qs.count()
     data = (
-        await qs.order_by("-id")
+        await qs.order_by(*query.orders)
         .limit(limit)
         .offset(offset)
         .values(

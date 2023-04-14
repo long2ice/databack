@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from starlette.status import HTTP_201_CREATED
 from tortoise import timezone
@@ -6,6 +6,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 
 from databack.enums import DataSourceType, TaskStatus
 from databack.models import RestoreLog
+from databack.schema.request import Query
 from databack.tasks import run_restore
 
 router = APIRouter()
@@ -26,12 +27,18 @@ class RestoreRequest(BaseModel):
 
 
 @router.get("", response_model=GetRestoreResponse)
-async def get_restore_logs(limit: int = 10, offset: int = 0, status: TaskStatus | None = None):
+async def get_restore_logs(
+    limit: int = 10,
+    offset: int = 0,
+    status: TaskStatus | None = None,
+    query: Query = Depends(Query),
+):
     qs = RestoreLog.all()
     if status:
         qs = qs.filter(status=status)
     total = await qs.count()
-    data = await qs.order_by("-id").limit(limit).offset(offset)
+    orders = query.orders if query.orders else ["-id"]
+    data = await qs.order_by(*orders).limit(limit).offset(offset)
     return {"total": total, "data": data}
 
 

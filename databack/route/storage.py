@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
@@ -6,6 +6,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_
 from databack import discover
 from databack.enums import StorageType
 from databack.models import Storage
+from databack.schema.request import Query
 from databack.storages import s3, ssh
 
 router = APIRouter()
@@ -18,7 +19,11 @@ class GetStorageResponse(BaseModel):
 
 @router.get("", response_model=GetStorageResponse)
 async def get_storages(
-    limit: int = 10, offset: int = 0, name: str = "", type: StorageType | None = None
+    limit: int = 10,
+    offset: int = 0,
+    name: str = "",
+    type: StorageType | None = None,
+    query: Query = Depends(Query),
 ):
     qs = Storage.all()
     if name:
@@ -28,7 +33,7 @@ async def get_storages(
     total = await qs.count()
     storages = (
         await qs.only("id", "name", "type", "path", "created_at", "updated_at")
-        .order_by("-id")
+        .order_by(*query.orders)
         .limit(limit)
         .offset(offset)
     )
