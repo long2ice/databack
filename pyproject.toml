@@ -30,7 +30,6 @@ pytest-custom-exit-code = "*"
 ruff = "*"
 types-aiofiles = "*"
 
-
 [tool.aerich]
 tortoise_orm = "databack.settings.TORTOISE_ORM"
 location = "./migrations"

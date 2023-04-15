@@ -1,4 +1,5 @@
 import asyncio
+import os
 import tempfile
 
 import aioshutil
@@ -12,7 +13,9 @@ class Mongo(Base):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.options = [f"{k}={v}" for k, v in self.kwargs.items()]
+        for key, value in self.kwargs.items():
+            self.options.append(key)
+            self.options.append(value)
 
     async def check(self):
         if not await aioshutil.which("mongodump"):
@@ -24,7 +27,9 @@ class Mongo(Base):
     async def backup(self):
         temp_dir = tempfile.mkdtemp()
         options = self.options
-        options.append(f"-o={temp_dir}")
+        file = os.path.join(temp_dir, f"{self.filename}.gz")
+        options.append(f"--archive={file}")
+        options.append("--gzip")
         proc = await asyncio.create_subprocess_exec(
             "mongodump",
             *options,
@@ -34,12 +39,13 @@ class Mongo(Base):
         stdout, stderr = await proc.communicate()
         if proc.returncode != 0:
             raise RuntimeError(f"mongodump failed with {proc.returncode}: {stderr.decode()}")
-        return temp_dir
+        return file
 
     async def restore(self, file: str):
         file = await self.get_restore(file)
         options = self.options
-        options.append(file)
+        options.append(f"--archive={file}")
+        options.append("--gzip")
         proc = await asyncio.create_subprocess_exec(
             "mongorestore",
             *options,

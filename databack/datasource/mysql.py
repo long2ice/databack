@@ -13,7 +13,6 @@ class MySQL(Base):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.options = []
         for k, v in self.kwargs.items():
             if v is True:
                 self.options.append(k)

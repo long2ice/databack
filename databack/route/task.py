@@ -80,7 +80,7 @@ class CreateTaskRequest(BaseModel):
     keep_days: int = 0
     enabled: bool = True
     sub_path: str = ""
-    cron: str = Field(..., example="0 0 * * *")
+    cron: str = Field("", example="0 0 * * *")
 
 
 @router.post("", status_code=HTTP_201_CREATED, dependencies=[Depends(refresh_scheduler)])

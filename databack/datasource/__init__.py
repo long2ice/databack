@@ -12,6 +12,8 @@ class Base:
     type: DataSourceType
 
     def __init__(self, **kwargs):
+        other_options = kwargs.pop("other_options", None)
+        self.options = other_options.split() if other_options else []
         self.kwargs = kwargs
         self.compress = self.kwargs.pop("compress", True)
 
@@ -19,9 +21,8 @@ class Base:
     def filename(self):
         return f'{timezone.now().strftime("%Y-%m-%d_%H-%M-%S")}'
 
-    @abc.abstractmethod
     async def check(self):
-        raise NotImplementedError
+        return True
 
     @abc.abstractmethod
     async def backup(self):

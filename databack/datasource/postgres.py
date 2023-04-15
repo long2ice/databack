@@ -13,7 +13,6 @@ class Postgres(Base):
 
     def __init__(self, password: str, backup_program: str | None = None, **kwargs):
         super().__init__(**kwargs)
-        self.options = []
         for k, v in self.kwargs.items():
             if v is True:
                 self.options.append(k)

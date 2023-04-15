@@ -1,11 +1,15 @@
 # databack
 
-Backup your data from MySQL/PostgreSQL/SSH etc. to any other storages.
-
-## Introduction
-
 `databack` is a tool to back up your data from MySQL/PostgreSQL/SSH etc. to any other storages like S3, SCP etc. Which
-can be run cron job to back up your data automatically.
+can be run cron job to back up your data automatically, and you can also restore your data from backup files.
+
+## Features
+
+- MySQL/PostgreSQL/SSH/Local data source.
+- S3/SCP/Local storage.
+- Cron job to back up your data automatically.
+- i18n support (English and Chinese).
+- Web UI to manage your backup tasks.
 
 ## Screenshots
 
@@ -13,13 +17,6 @@ You can try it on [Demo](https://demo.databack.dev/) site.
 
 ![databack](./images/home.png)
 ![databack](./images/datasource.png)
-
-## Features
-
-- MySQL/PostgreSQL/SSH/Local data source.
-- S3/SCP/Local storage.
-- Cron job to back up your data automatically.
-- i18n support.
 
 ## Deployment
 

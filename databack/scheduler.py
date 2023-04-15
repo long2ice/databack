@@ -3,6 +3,7 @@ import asyncio
 from crontab import CronTab
 from loguru import logger
 from tortoise import timezone
+from tortoise.expressions import Q
 
 from databack.constants import SCHEDULER_SLEEP_SECONDS
 from databack.models import Task
@@ -19,7 +20,12 @@ class Scheduler:
             wait_seconds = []
             try:
                 tasks = (
-                    await Task.filter(enabled=True).only("id", "cron", "name", "next_run_at").all()
+                    await Task.filter(
+                        ~Q(cron=""),
+                        enabled=True,
+                    )
+                    .only("id", "cron", "name", "next_run_at")
+                    .all()
                 )
                 for task in tasks:
                     if not task.next_run_at:

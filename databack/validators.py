@@ -7,6 +7,8 @@ from tortoise.validators import Validator
 
 class CronValidator(Validator):
     def __call__(self, value: str):
+        if not value:
+            return
         try:
             CronTab(value)
         except ValueError:
