@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from databack.depends import set_i18n
-from databack.route import datasource, restore, stat, storage, task, task_log
+from databack.api import datasource, restore, stat, storage, task, task_log
 
 router = APIRouter(dependencies=[Depends(set_i18n)])
 router.include_router(task.router, prefix="/task", tags=["Task"])

@@ -4,7 +4,7 @@ import asyncssh
 from pydantic import BaseModel
 
 from databack.enums import StorageType
-from databack.storages import Base
+from databack.storage import Base
 
 
 class SSHOptions(BaseModel):

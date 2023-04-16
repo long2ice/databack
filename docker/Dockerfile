@@ -23,9 +23,9 @@ COPY --from=tools-builder /mongo-tools/bin/mongodump /usr/bin/mongodump
 COPY --from=tools-builder /mongo-tools/bin/mongorestore /usr/bin/mongorestore
 COPY --from=tools-builder /redis-dump-go/redis-dump-go /usr/bin/redis-dump-go
 WORKDIR /databack
-COPY pyproject.toml poetry.lock /databack/
+COPY ../pyproject.toml poetry.lock /databack/
 RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.11 get-pip.py && pip3.11 install poetry && poetry install --no-root
-COPY . /databack
+COPY .. /databack
 RUN poetry install
 ENTRYPOINT ["uvicorn", "databack.app:app", "--host", "0.0.0.0"]
 CMD ["--port", "8000"]

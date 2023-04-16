@@ -5,7 +5,7 @@ import aiofiles.ospath
 import aioshutil
 
 from databack.enums import StorageType
-from databack.storages import Base
+from databack.storage import Base
 
 
 class Local(Base):

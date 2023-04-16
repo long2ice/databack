@@ -4,11 +4,11 @@ import pkgutil
 from types import ModuleType
 from typing import Type
 
-from databack import datasource, storages
+from databack import datasource, storage
 from databack.enums import DataSourceType, StorageType
 
 
-def _discover(module: ModuleType, t: Type[datasource.Base] | Type[storages.Base]):
+def _discover(module: ModuleType, t: Type[datasource.Base] | Type[storage.Base]):
     ret = {}
     for m in pkgutil.iter_modules(module.__path__):
         mod = importlib.import_module(f"{module.__name__}.{m.name}")
@@ -25,8 +25,8 @@ def get_data_source(type_: DataSourceType) -> Type[datasource.Base]:
     return _data_sources[type_]
 
 
-_storages = _discover(storages, storages.Base)
+_storages = _discover(storage, storage.Base)
 
 
-def get_storage(type_: StorageType) -> Type[storages.Base]:
+def get_storage(type_: StorageType) -> Type[storage.Base]:
     return _storages[type_]

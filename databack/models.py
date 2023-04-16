@@ -2,8 +2,8 @@ from crontab import CronTab
 from tortoise import Model, fields, timezone
 
 from databack.enums import DataSourceType, StorageType, TaskStatus
-from databack.storages.s3 import S3Options
-from databack.storages.ssh import SSHOptions
+from databack.storage.s3 import S3Options
+from databack.storage.ssh import SSHOptions
 from databack.validators import CronValidator
 
 

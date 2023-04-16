@@ -7,7 +7,7 @@ from databack import discover
 from databack.enums import StorageType
 from databack.models import Storage
 from databack.schema.request import Query
-from databack.storages import s3, ssh
+from databack.storage import s3, ssh
 
 router = APIRouter()
 
