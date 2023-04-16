@@ -18,7 +18,7 @@ jobs:
           image-name: databack
           custom-args: --platform=linux/arm64,linux/amd64
           dockerfile: docker/Dockerfile-full
-          image-tags: full
+          image-tag: full
   build:
     runs-on: ubuntu-latest
     steps:
