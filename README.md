@@ -29,20 +29,20 @@ services:
     restart: always
     env_file: .env
     network_mode: host
-    image: ghcr.io/long2ice/databack/databack
+    image: ghcr.io/long2ice/databack/databack:full
 ```
 
 ## Configuration
 
 Just set environment variables in `.env` file.
 
-```ini
-DB_URL = mysql://root:123456@127.0.0.1:3306/databack
-DEBUG = True
-REDIS_URL = redis://127.0.0.1:6379/0
-SENTRY_DSN = 'xxx'
-ENV = production
-WORKER = True
+```dotenv
+DB_URL=mysql://root:123456@127.0.0.1:3306/databack
+DEBUG=True
+REDIS_URL=redis://127.0.0.1:6379/0
+SENTRY_DSN='xxx' # remove it if you don't use sentry
+ENV=production
+WORKER=True
 ```
 
 ## Worker
@@ -59,7 +59,7 @@ services:
     restart: always
     env_file: .env
     network_mode: host
-    image: ghcr.io/long2ice/databack/databack
+    image: ghcr.io/long2ice/databack/databack:full
     entrypoint: rearq databack.tasks:rearq worker -t
 ```
 
