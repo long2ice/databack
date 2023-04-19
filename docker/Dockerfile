@@ -1,8 +1,3 @@
-FROM node as frontend-builder
-RUN git clone https://github.com/long2ice/databack-web.git /databack-web
-WORKDIR /databack-web
-RUN npm install && npm run build
-
 FROM golang as tools-builder
 RUN apt update -y && apt install -y libkrb5-dev
 RUN git clone https://github.com/mongodb/mongo-tools /mongo-tools
@@ -18,7 +13,6 @@ RUN apt update -y && apt install -y postgresql-client
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 ENV POETRY_VIRTUALENVS_CREATE false
 RUN mkdir -p /databack
-COPY --from=frontend-builder /databack-web/dist /databack/static
 COPY --from=tools-builder /mongo-tools/bin/mongodump /usr/bin/mongodump
 COPY --from=tools-builder /mongo-tools/bin/mongorestore /usr/bin/mongorestore
 COPY --from=tools-builder /redis-dump-go/redis-dump-go /usr/bin/redis-dump-go
