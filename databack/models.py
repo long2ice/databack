@@ -19,7 +19,7 @@ class Storage(BaseModel):
     type = fields.CharEnumField(StorageType)
     name = fields.CharField(max_length=255, unique=True)
     path = fields.CharField(max_length=255, default="")
-    options = fields.JSONField()
+    options = fields.JSONField(null=True)
 
     @property
     def options_parsed(self):
