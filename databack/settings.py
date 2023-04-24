@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     DB_URL: str
     REDIS_URL: str
     WORKER: bool = True
-    TIMEZONE: str = "UTC"
 
     class Config:
         env_file = ".env"
