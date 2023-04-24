@@ -63,6 +63,11 @@ services:
     entrypoint: rearq databack.tasks:rearq worker -t
 ```
 
+## Timezone
+
+By default, `databack` will use `UTC` timezone for `cron` expression. If you want to use other timezone, you can set
+environment variable `TZ` to your timezone.
+
 ## Frontend
 
 The frontend project is [here](https://github.com/long2ice/databack-web).
