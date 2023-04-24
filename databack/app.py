@@ -8,6 +8,7 @@ from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
 from databack import i18n
+from databack.api import router
 from databack.exceptions import (
     custom_http_exception_handler,
     exception_handler,
@@ -15,7 +16,6 @@ from databack.exceptions import (
     validation_exception_handler,
 )
 from databack.log import init_logging
-from databack.api import router
 from databack.scheduler import Scheduler
 from databack.settings import TORTOISE_ORM, settings
 from databack.static import SPAStaticFiles

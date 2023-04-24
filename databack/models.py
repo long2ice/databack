@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from crontab import CronTab
 from tortoise import Model, fields, timezone
 
@@ -53,10 +55,12 @@ class Task(BaseModel):
     next_run_at = fields.DatetimeField(null=True)
 
     async def refresh_next_run_at(self):
-        cron = CronTab(self.cron)
-        next_time = cron.next(default_utc=True, return_datetime=True)
-        next_time = timezone.make_aware(next_time)
-        self.next_run_at = next_time
+        if not self.cron:
+            self.next_run_at = None
+        else:
+            cron = CronTab(self.cron)
+            next_time = cron.next(default_utc=False)
+            self.next_run_at = timezone.now() + timedelta(seconds=next_time)
         await self.save(update_fields=["next_run_at"])
 
 

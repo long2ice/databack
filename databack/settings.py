@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DB_URL: str
     REDIS_URL: str
     WORKER: bool = True
+    TIMEZONE: str = "UTC"
 
     class Config:
         env_file = ".env"
@@ -23,6 +24,7 @@ TORTOISE_ORM = {
             "default_connection": "default",
         },
     },
+    "use_tz": True,
     "connections": {"default": settings.DB_URL},
 }
 if settings.SENTRY_DSN:

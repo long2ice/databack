@@ -5,6 +5,7 @@ from databack.scheduler import Scheduler
 
 
 async def refresh_scheduler():
+    yield
     await Scheduler.refresh()
 
 

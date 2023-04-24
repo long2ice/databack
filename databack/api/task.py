@@ -100,19 +100,23 @@ async def run_task(pk: int):
 
 
 class UpdateTaskRequest(BaseModel):
-    name: str | None
-    data_source_id: int | None
-    storage_id: int | None
-    keep_num: int | None
-    keep_days: int | None
-    sub_path: str | None
-    enabled: bool | None
-    cron: str | None
+    name: str
+    data_source_id: int
+    storage_id: int
+    keep_num: int
+    keep_days: int
+    sub_path: str
+    enabled: bool
+    cron: str
 
 
 @router.patch("/{pk}", status_code=HTTP_204_NO_CONTENT, dependencies=[Depends(refresh_scheduler)])
 async def update_task(pk: int, body: UpdateTaskRequest):
-    await Task.filter(id=pk).update(**body.dict(exclude_none=True))
+    task = await Task.get(id=pk)
+    old_cron = task.cron
+    await task.update_from_dict(body.dict()).save()
+    if old_cron != body.cron:
+        await task.refresh_next_run_at()
 
 
 @router.delete("/{pks}", status_code=HTTP_204_NO_CONTENT, dependencies=[Depends(refresh_scheduler)])

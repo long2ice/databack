@@ -35,7 +35,7 @@ class Scheduler:
                         await run_backup.delay(task.id)
                         await task.refresh_next_run_at()
                     cron = CronTab(task.cron)
-                    seconds = cron.next(default_utc=True)
+                    seconds = cron.next(default_utc=False)
                     wait_seconds.append(seconds)
             except Exception as e:
                 logger.error(f"Scheduler error: {e}")
