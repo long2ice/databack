@@ -19,7 +19,7 @@ class Local(Base):
         return os.path.join(self.path, os.path.basename(file))
 
     async def download(self, file: str):
-        return os.path.join(self.path, file)
+        await aioshutil.copy(file, self.path)
 
     async def delete(self, file: str):
         try:

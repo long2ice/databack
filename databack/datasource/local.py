@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import aiofiles.ospath
@@ -19,9 +20,14 @@ class Local(Base):
 
     async def backup(self):
         temp_dir = tempfile.mkdtemp()
-        destination = f"{temp_dir}/{self.filename}"
-        await aioshutil.copytree(self.path, destination)
-        return destination
+        if os.path.isdir(self.path):
+            destination = os.path.join(temp_dir, self.filename, os.path.basename(self.path))
+            await aioshutil.copytree(self.path, destination)
+        else:
+            destination = os.path.join(temp_dir, self.filename)
+            os.makedirs(destination, exist_ok=True)
+            await aioshutil.copy(self.path, destination)
+            return destination
 
     async def restore(self, file: str):
         file = await self.get_restore(file)
