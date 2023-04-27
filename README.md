@@ -18,6 +18,23 @@ You can try it on [Demo](https://demo.databack.dev/) site.
 ![databack](./images/home.png)
 ![databack](./images/datasource.png)
 
+## Pro Version
+
+There is also a paid pro version, which has more features:
+
+- Admin management and access control.
+- More data sources and storages. (coming soon)
+- Action logs audit.
+- Feature request and technical support.
+- More features coming soon.
+
+Demo site: [https://pro.databack.dev/login](https://pro.databack.dev/login)
+
+- **email**: `demo@databack.dev`
+- **password**: `123456`
+
+You can also [contact me](mailto:long2ice@gmail.com) to get a trial license.
+
 ## Deployment
 
 The easiest way to deploy `databack` is to use `docker-compose`.
@@ -31,6 +48,11 @@ services:
     network_mode: host
     image: ghcr.io/long2ice/databack/databack:full
 ```
+
+### `databack:full` vs `databack`
+
+The `databack:full` image contains frontend and backend, which is suitable for single node deployment. The `databack`
+image only contains backend, you need to deploy frontend separately.
 
 ## Configuration
 
