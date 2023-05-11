@@ -1,8 +1,0 @@
-version: "3"
-services:
-  databack:
-    image: databack
-    build: ..
-    restart: always
-    env_file: ../.env
-    network_mode: host

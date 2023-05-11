@@ -49,11 +49,6 @@ services:
     image: ghcr.io/long2ice/databack/databack:full
 ```
 
-### `databack:full` vs `databack`
-
-The `databack:full` image contains frontend and backend, which is suitable for single node deployment. The `databack`
-image only contains backend, you need to deploy frontend separately.
-
 ## Configuration
 
 Just set environment variables in `.env` file.
