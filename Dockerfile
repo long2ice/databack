@@ -30,4 +30,4 @@ COPY ../pyproject.toml poetry.lock /databack/
 RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.11 get-pip.py && pip3.11 install poetry && poetry install --no-root && rm get-pip.py
 COPY .. /databack
 RUN poetry install
-CMD ["python", "-m", "databack.app"]
+CMD ["python3", "-m", "databack.app"]
