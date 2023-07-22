@@ -15,7 +15,7 @@ jobs:
         uses: VaultVulp/gp-docker-action@1.6.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          image-name: databack-pro
+          image-name: databack
           custom-args: --build-arg=GIT_TOKEN=${{ secrets.GIT_TOKEN }}
   deploy:
     runs-on: ubuntu-latest
