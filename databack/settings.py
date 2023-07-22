@@ -14,10 +14,10 @@ class Settings(BaseSettings):
     LICENSE: str
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-    GOOGLE_CLIENT_ID: str | None
-    GOOGLE_CLIENT_SECRET: str | None
-    GITHUB_CLIENT_ID: str | None
-    GITHUB_CLIENT_SECRET: str | None
+    GOOGLE_CLIENT_ID: str | None = None
+    GOOGLE_CLIENT_SECRET: str | None = None
+    GITHUB_CLIENT_ID: str | None = None
+    GITHUB_CLIENT_SECRET: str | None = None
 
     @property
     def enable_github_oauth(self):
