@@ -14,7 +14,7 @@ router = APIRouter()
 
 class GetStorageResponse(BaseModel):
     total: int
-    data: pydantic_queryset_creator(Storage)  # type: ignore
+    data: pydantic_queryset_creator(Storage, exclude=("options",))  # type: ignore
 
 
 @router.get("", response_model=GetStorageResponse)

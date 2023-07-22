@@ -15,7 +15,7 @@ router = APIRouter()
 
 class GetDataSourceResponse(BaseModel):
     total: int
-    data: pydantic_queryset_creator(DataSource)  # type: ignore
+    data: pydantic_queryset_creator(DataSource, exclude=("options",))  # type: ignore
 
 
 @router.get("", response_model=GetDataSourceResponse)
