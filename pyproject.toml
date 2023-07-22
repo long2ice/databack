@@ -8,11 +8,11 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = { version = "*", extras = ["all"] }
-tortoise-orm = { version = "*", extras = ["all"] }
+tortoise-orm = { git = "https://github.com/tortoise/tortoise-orm.git", branch = "develop" }
 sentry-sdk = { version = "*", extras = ["fastapi"] }
 loguru = "*"
 aerich = "*"
-asyncmy = {version = "^0.2.8rc1", allow-prereleases = true}
+asyncmy = "^0.2.8"
 asyncpg = "*"
 rearq = { git = "https://github.com/long2ice/rearq.git", branch = "dev" }
 aioshutil = "*"
@@ -22,8 +22,8 @@ python-i18n = "*"
 fastapi-jwt = "*"
 passlib = {version = "*", extras = ["bcrypt"]}
 typer = {version = "*", extras = ["all"]}
-pyconcrete = "*"
 authlib = "*"
+pydantic-settings = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"

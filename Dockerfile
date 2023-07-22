@@ -1,6 +1,6 @@
 FROM node as frontend-builder
 ARG GIT_TOKEN
-RUN git clone https://$GIT_TOKEN@github.com/long2ice/databack-web-pro.git /databack-web
+RUN git clone https://$GIT_TOKEN@github.com/long2ice/databack-web.git /databack-web
 WORKDIR /databack-web
 RUN npm install && npm run build
 
@@ -19,7 +19,6 @@ RUN curl -o /etc/apt/trusted.gpg.d/pgdg.asc https://www.postgresql.org/media/key
 RUN apt update -y && apt install -y postgresql-client
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 ENV POETRY_VIRTUALENVS_CREATE=false
-ENV PYCONCRETE_PASSPHRASE=long2ice
 RUN mkdir -p /databack
 COPY --from=frontend-builder /databack-web/dist /databack/static
 COPY --from=tools-builder /mongo-tools/bin/mongodump /usr/bin/mongodump
@@ -31,5 +30,4 @@ COPY ../pyproject.toml poetry.lock /databack/
 RUN curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.11 get-pip.py && pip3.11 install poetry && poetry install --no-root && rm get-pip.py
 COPY .. /databack
 RUN poetry install
-RUN pyconcrete-admin.py compile --source=databack --pye && find databack -name '*.py' -delete
-CMD ["pyconcrete", "databack/app.pye"]
+CMD ["python", "-m", "databack.app"]

@@ -15,12 +15,10 @@ from databack.settings import settings
 from databack.utils import get_file_size
 
 rearq = ReArq(
-    db_url=settings.DB_URL,
     redis_url=settings.REDIS_URL,
     keep_job_days=7,
     job_retry=0,
     raise_job_error=True,
-    generate_schemas=True,
     expire=60,
 )
 
@@ -29,7 +27,7 @@ rearq = ReArq(
 async def startup():
     await Tortoise.init(
         db_url=settings.DB_URL,
-        modules={"models": ["databack.models"]},
+        modules={"models": ["databack.models"], "rearq": ["rearq.server.models"]},
     )
     await Tortoise.generate_schemas()
 

@@ -1,12 +1,12 @@
 import sentry_sdk
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from sentry_sdk.integrations.redis import RedisIntegration
 
 
 class Settings(BaseSettings):
     DEBUG: bool = False
     SENTRY_DSN: str | None
-    ENV = "production"
+    ENV: str = "production"
     DB_URL: str
     REDIS_URL: str
     WORKER: bool = True

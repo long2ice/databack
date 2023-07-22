@@ -1,7 +1,7 @@
 import asyncio
 
 from aerich import Command
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from rearq.server.app import app as rearq_server
 from starlette.middleware.sessions import SessionMiddleware
@@ -50,12 +50,11 @@ app.add_exception_handler(Exception, exception_handler)
 
 @app.on_event("startup")
 async def startup():
-    await rearq.init()
     init_logging()
     locales.init()
     aerich = Command(TORTOISE_ORM)
     await aerich.init()
-    await aerich.upgrade()
+    await aerich.upgrade(True)
     asyncio.ensure_future(Scheduler.start())
     if settings.WORKER:
         await rearq_server.start_worker()
