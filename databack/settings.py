@@ -5,11 +5,27 @@ from sentry_sdk.integrations.redis import RedisIntegration
 
 class Settings(BaseSettings):
     DEBUG: bool = False
-    SENTRY_DSN: str | None = None
+    SENTRY_DSN: str | None
     ENV = "production"
     DB_URL: str
     REDIS_URL: str
     WORKER: bool = True
+    SECRET_KEY: str
+    LICENSE: str
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    GOOGLE_CLIENT_ID: str | None
+    GOOGLE_CLIENT_SECRET: str | None
+    GITHUB_CLIENT_ID: str | None
+    GITHUB_CLIENT_SECRET: str | None
+
+    @property
+    def enable_github_oauth(self):
+        return self.GITHUB_CLIENT_ID and self.GITHUB_CLIENT_SECRET
+
+    @property
+    def enable_google_oauth(self):
+        return self.GOOGLE_CLIENT_ID and self.GOOGLE_CLIENT_SECRET
 
     class Config:
         env_file = ".env"
@@ -23,7 +39,6 @@ TORTOISE_ORM = {
             "default_connection": "default",
         },
     },
-    "use_tz": True,
     "connections": {"default": settings.DB_URL},
 }
 if settings.SENTRY_DSN:

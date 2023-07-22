@@ -21,6 +21,7 @@ rearq = ReArq(
     job_retry=0,
     raise_job_error=True,
     generate_schemas=True,
+    expire=60,
 )
 
 
@@ -49,15 +50,17 @@ async def run_backup(pk: int):
     )
     data_source = task.data_source
     storage = task.storage
-    data_source_cls = get_data_source(data_source.type)
-    data_source_obj = data_source_cls(compress=task.compress, **data_source.options)  # type: ignore
-    storage_cls = get_storage(storage.type)
-    storage_path = storage.path
-    sub_path = task.sub_path
-    storage_obj = storage_cls(
-        options=storage.options_parsed, path=os.path.join(storage_path, sub_path)
-    )
     try:
+        data_source_cls = get_data_source(data_source.type)
+        data_source_obj = data_source_cls(
+            compress=task.compress, **data_source.options  # type: ignore
+        )
+        storage_cls = get_storage(storage.type)
+        storage_path = storage.path
+        sub_path = task.sub_path
+        storage_obj = storage_cls(
+            options=storage.options_parsed, path=os.path.join(storage_path, sub_path)
+        )
         backup = await data_source_obj.get_backup()
         task_log.size = await get_file_size(backup)
         file = await storage_obj.upload(backup)
@@ -102,6 +105,7 @@ async def run_restore(pk: int):
         await storage_obj.download(task_log.path)
         await data_source_obj.restore(local_file)
         await aioshutil.rmtree(local_path)
+        await aioshutil.rmtree(os.path.dirname(local_file))
         restore_log.status = TaskStatus.success
     except Exception as e:
         logger.exception(e)

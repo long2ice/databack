@@ -1,7 +1,6 @@
 import os
 import tempfile
 
-import aiofiles.ospath
 import aioshutil
 
 from databack.datasource import Base
@@ -16,7 +15,7 @@ class Local(Base):
         self.path = self.kwargs.get("path")
 
     async def check(self):
-        return await aiofiles.ospath.exists(self.path)
+        return os.path.exists(self.path)
 
     async def backup(self):
         temp_dir = tempfile.mkdtemp()

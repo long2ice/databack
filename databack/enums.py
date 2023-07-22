@@ -8,6 +8,7 @@ class StorageType(str, Enum):
 
 
 class DataSourceType(str, Enum):
+    clickhouse = "clickhouse"
     mysql = "mysql"
     postgres = "postgres"
     local = "local"

@@ -10,9 +10,11 @@ jobs:
           python-version: "3.x"
       - name: Install and configure Poetry
         run: |
-          pip install -U pip poetry
+          pip install poetry --upgrade --pre
           poetry config virtualenvs.create false
       - name: Install dependencies
         run: poetry install
+        env:
+          PYCONCRETE_PASSPHRASE: ${{ secrets.PYCONCRETE_PASSPHRASE }}
       - name: CI
         run: cp .env.example .env && make ci

@@ -19,6 +19,11 @@ aioshutil = "*"
 aioboto3 = "*"
 asyncssh = "*"
 python-i18n = "*"
+fastapi-jwt = "*"
+passlib = {version = "*", extras = ["bcrypt"]}
+typer = {version = "*", extras = ["all"]}
+pyconcrete = "*"
+authlib = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"

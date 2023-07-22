@@ -73,8 +73,10 @@ class CreateDataSourceRequest(BaseModel):
 async def create_datasource(body: CreateDataSourceRequest):
     data_source_cls = get_data_source(body.type)
     data_source_obj = data_source_cls(**body.options)
-    if not await data_source_obj.check():
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Data source check failed")
+    try:
+        await data_source_obj.check()
+    except Exception as e:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
     try:
         await DataSource.create(**body.dict())
     except IntegrityError:
@@ -95,8 +97,10 @@ async def update_datasource(pk: int, body: UpdateDataSourceRequest):
     data_source = await DataSource.get(id=pk)
     data_source_cls = get_data_source(data_source.type)
     data_source_obj = data_source_cls(**data_source.options)  # type: ignore
-    if not await data_source_obj.check():
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Data source check failed")
+    try:
+        await data_source_obj.check()
+    except Exception as e:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
     try:
         await DataSource.filter(id=pk).update(**body.dict(exclude_none=True))
     except IntegrityError:

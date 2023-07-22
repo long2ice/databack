@@ -6,7 +6,7 @@ from tortoise import Model, fields, timezone
 from databack.enums import DataSourceType, StorageType, TaskStatus
 from databack.storage.s3 import S3Options
 from databack.storage.ssh import SSHOptions
-from databack.validators import CronValidator
+from databack.validators import CronValidator, EmailValidator
 
 
 class BaseModel(Model):
@@ -68,7 +68,7 @@ class TaskLog(BaseModel):
     task: fields.ForeignKeyRelation[Task] = fields.ForeignKeyField("models.Task")
     status = fields.CharEnumField(TaskStatus)
     path = fields.CharField(max_length=255, null=True)
-    size = fields.IntField(null=True)
+    size = fields.BigIntField(null=True)
     message = fields.TextField(null=True)
     is_deleted = fields.BooleanField(default=False)
     start_at = fields.DatetimeField()
@@ -83,3 +83,20 @@ class RestoreLog(BaseModel):
     status = fields.CharEnumField(TaskStatus, default=TaskStatus.running)
     start_at = fields.DatetimeField()
     end_at = fields.DatetimeField(null=True)
+
+
+class Admin(BaseModel):
+    nickname = fields.CharField(max_length=255)
+    email = fields.CharField(max_length=255, unique=True, validators=[EmailValidator()])
+    last_login_at = fields.DatetimeField(null=True)
+    password = fields.CharField(max_length=255)
+    is_superuser = fields.BooleanField(default=False)
+    is_active = fields.BooleanField(default=True)
+
+
+class ActionLog(BaseModel):
+    admin: fields.ForeignKeyRelation[Admin] = fields.ForeignKeyField("models.Admin")
+    ip = fields.CharField(max_length=255)
+    content = fields.JSONField()
+    path = fields.CharField(max_length=255)
+    method = fields.CharField(max_length=10)

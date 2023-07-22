@@ -1,13 +1,14 @@
 import asyncio
 
 from aerich import Command
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from rearq.server.app import app as rearq_server
+from starlette.middleware.sessions import SessionMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.exceptions import DoesNotExist
 
-from databack import i18n
+from databack import locales
 from databack.api import router
 from databack.exceptions import (
     custom_http_exception_handler,
@@ -34,6 +35,7 @@ else:
 app.include_router(router, prefix="/api")
 app.mount("/rearq", rearq_server)
 app.mount("/", SPAStaticFiles(directory="static", html=True), name="static")
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
 rearq_server.set_rearq(rearq)
 register_tortoise(
@@ -50,7 +52,7 @@ app.add_exception_handler(Exception, exception_handler)
 async def startup():
     await rearq.init()
     init_logging()
-    i18n.init()
+    locales.init()
     aerich = Command(TORTOISE_ORM)
     await aerich.init()
     await aerich.upgrade()
@@ -62,3 +64,9 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await Scheduler.stop()
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host=settings.HOST, port=settings.PORT)

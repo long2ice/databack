@@ -1,0 +1,14 @@
+data_source_exists: "数据源 '%{name}' 已经存在！"
+cron_invalid: "无效的 cron 表达式 '%{cron}'"
+task_disabled: "任务 '%{name}' 已经禁用"
+email_invalid: "无效的邮箱地址 '%{email}'"
+login:
+  user_not_found: "用户不存在"
+  password_error: "密码错误"
+admin_exists: "管理员用户已经存在"
+admin_inited: "管理员用户已经初始化"
+auth:
+  not_active: "用户禁止登录"
+  not_superuser: "只有管理员用户才能操作"
+  not_login: "用户未登录"
+license_expired: "授权已经过期"

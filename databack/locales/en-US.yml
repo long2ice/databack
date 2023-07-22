@@ -1,0 +1,14 @@
+data_source_exists: "Data source '%{name}' already exists!"
+cron_invalid: "Invalid cron expression '%{cron}'"
+task_disabled: "Task '%{name}' is disabled"
+email_invalid: "Invalid email address '%{email}'"
+login:
+  user_not_found: "User not found"
+  password_error: "Password error"
+admin_exists: "Admin user already exists"
+admin_inited: "Admin user already inited"
+auth:
+  not_active: "User not active"
+  not_superuser: "Only superuser can do this"
+  not_login: "User not login"
+license_expired: "License expired"

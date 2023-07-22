@@ -1,3 +1,0 @@
-data_source_exists: "数据源 '%{name}' 已经存在！"
-cron_invalid: "无效的 cron 表达式 '%{cron}'"
-task_disabled: "任务 '%{name}' 已经禁用"
