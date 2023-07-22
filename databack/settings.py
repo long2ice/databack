@@ -11,7 +11,6 @@ class Settings(BaseSettings):
     REDIS_URL: str
     WORKER: bool = True
     SECRET_KEY: str
-    LICENSE: str
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     GOOGLE_CLIENT_ID: str | None = None
