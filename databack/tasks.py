@@ -11,7 +11,7 @@ from tortoise import Tortoise, timezone
 from databack.discover import get_data_source, get_storage
 from databack.enums import TaskStatus
 from databack.models import RestoreLog, Task, TaskLog
-from databack.settings import settings
+from databack.settings import TORTOISE_ORM, settings
 from databack.utils import get_file_size
 
 rearq = ReArq(
@@ -25,10 +25,7 @@ rearq = ReArq(
 
 @rearq.on_startup
 async def startup():
-    await Tortoise.init(
-        db_url=settings.DB_URL,
-        modules={"models": ["databack.models"], "rearq": ["rearq.server.models"]},
-    )
+    await Tortoise.init(config=TORTOISE_ORM)
     await Tortoise.generate_schemas()
 
 

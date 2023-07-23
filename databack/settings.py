@@ -37,6 +37,10 @@ TORTOISE_ORM = {
             "models": ["databack.models", "aerich.models"],
             "default_connection": "default",
         },
+        "rearq": {
+            "models": ["rearq.server.models"],
+            "default_connection": "default",
+        },
     },
     "connections": {"default": settings.DB_URL},
 }
