@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
-from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
+from tortoise.contrib.pydantic import pydantic_queryset_creator
 
 from databack import discover
 from databack.enums import StorageType
@@ -46,7 +46,7 @@ async def get_storage_basic():
     return data
 
 
-@router.get("/{pk}", response_model=pydantic_model_creator(Storage))  # type: ignore
+@router.get("/{pk}")  # type: ignore
 async def get_storage(pk: int):
     return await Storage.get(id=pk)
 
