@@ -16,7 +16,7 @@ FROM snakepacker/python:3.11
 RUN apt update -y && apt install -y mysql-client curl redis-tools gcc libc6-dev python3.11-dev
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 RUN curl -o /etc/apt/trusted.gpg.d/pgdg.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
-RUN apt update -y && apt install -y postgresql-client
+RUN apt update -y && apt install -y postgresql-client-16
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 ENV POETRY_VIRTUALENVS_CREATE=false
 RUN mkdir -p /databack
