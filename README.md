@@ -13,7 +13,7 @@ can be run cron job to back up your data automatically, and you can also restore
 
 ## Screenshots
 
-You can try it on [Demo](https://demo.databack.dev/) site.
+You can try it on [Demo](https://databack-demo.long2ice.io/) site.
 
 ![databack](./images/home.png)
 ![databack](./images/datasource.png)
