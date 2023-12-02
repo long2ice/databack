@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from tortoise.contrib.pydantic import pydantic_queryset_creator
 
@@ -52,10 +52,10 @@ async def get_storage(pk: int):
 
 
 class CreateStorageRequest(BaseModel):
-    type: StorageType = Field(..., example="local")
-    name: str = Field(..., example="local")
-    path: str = Field(..., example="/data")
-    options: s3.S3Options | ssh.SSHOptions | None = Field(...)
+    type: StorageType
+    name: str
+    path: str
+    options: s3.S3Options | ssh.SSHOptions | None
 
 
 @router.post("", status_code=HTTP_201_CREATED)

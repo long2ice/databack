@@ -1,6 +1,6 @@
 import i18n
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from tortoise.contrib.pydantic import pydantic_model_creator
 
@@ -80,7 +80,7 @@ class CreateTaskRequest(BaseModel):
     keep_days: int = 0
     enabled: bool = True
     sub_path: str = ""
-    cron: str = Field("", example="0 0 * * *")
+    cron: str
 
 
 @router.post("", status_code=HTTP_201_CREATED, dependencies=[Depends(refresh_scheduler)])

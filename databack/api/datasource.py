@@ -1,6 +1,6 @@
 import i18n
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
 from tortoise.contrib.pydantic import pydantic_queryset_creator
 from tortoise.exceptions import IntegrityError
@@ -46,27 +46,16 @@ async def get_datasource_basic():
     data = await DataSource.all().values("id", "name")
     return data
 
+
 @router.get("/{pk}")
 async def get_datasource_(pk: int):
-
     return await DataSource.get(id=pk)
 
 
 class CreateDataSourceRequest(BaseModel):
-    type: DataSourceType = Field(..., example=DataSourceType.mysql)
-    name: str = Field(..., example="test")
-    options: dict = Field(
-        ...,
-        example={
-            "--host": "localhost",
-            "--port": 3306,
-            "--user": "root",
-            "--password": "123456",
-            "--include-databases": "test",
-            "--set-gtid-purged": "OFF",
-            "--add-drop-database": True,
-        },
-    )
+    type: DataSourceType
+    name: str
+    options: dict
 
 
 @router.post("", status_code=HTTP_201_CREATED)
