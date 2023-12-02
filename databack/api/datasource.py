@@ -2,7 +2,7 @@ import i18n
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST
-from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
+from tortoise.contrib.pydantic import pydantic_queryset_creator
 from tortoise.exceptions import IntegrityError
 
 from databack.discover import get_data_source
@@ -46,9 +46,9 @@ async def get_datasource_basic():
     data = await DataSource.all().values("id", "name")
     return data
 
-
-@router.get("/{pk}", response_model=pydantic_model_creator(DataSource))  # type: ignore
+@router.get("/{pk}")
 async def get_datasource_(pk: int):
+
     return await DataSource.get(id=pk)
 
 
