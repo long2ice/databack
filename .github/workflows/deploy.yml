@@ -26,4 +26,4 @@ jobs:
         uses: steebchen/kubectl@v2.0.0
         with:
           config: ${{ secrets.KUBE_CONFIG }}
-          command: rollout restart deployment databack databack-demo
+          command: rollout restart deployment databack databack-worker databack-demo
